@@ -1,0 +1,244 @@
+-- ============================================================
+--  rental_motor — Database Schema & Seed Data
+-- ============================================================
+
+CREATE DATABASE IF NOT EXISTS rental_motor;
+USE rental_motor;
+
+
+-- ------------------------------------------------------------
+--  1. CABANG
+-- ------------------------------------------------------------
+
+3 cabang 
+    SDJ di sidoarjo
+    SBY di surabaya
+    MJK di mojokerto
+alamat bisa disesuaikan terserah 
+
+CREATE TABLE cabang (
+    id_cabang   INT AUTO_INCREMENT PRIMARY KEY,
+    nama_cabang VARCHAR(100) NOT NULL,
+    alamat      TEXT         NOT NULL,
+    kota        VARCHAR(50)  NOT NULL
+);
+
+INSERT INTO cabang (nama_cabang, alamat, kota) VALUES
+    ('SDJ', 'Jl. Ahmad Yani No. 45, Kecamatan Sidoarjo', 'Sidoarjo'),
+    ('SBY', 'Jl. Tunjungan No. 12, Genteng',             'Surabaya'),
+    ('MJK', 'Jl. Gajah Mada No. 88, Magersari',          'Mojokerto');
+
+
+-- ------------------------------------------------------------
+--  2. KARYAWAN
+-- ------------------------------------------------------------
+
+Tiap cabang kasih 3 nama karyawan
+
+CREATE TABLE karyawan (
+    id_karyawan   INT AUTO_INCREMENT PRIMARY KEY,
+    id_cabang     INT          NOT NULL,
+    nama_karyawan VARCHAR(100) NOT NULL,
+    jabatan       VARCHAR(50)  NOT NULL,
+    FOREIGN KEY (id_cabang) REFERENCES cabang(id_cabang)
+);
+
+INSERT INTO karyawan (id_cabang, nama_karyawan, jabatan) VALUES
+    -- Cabang SDJ (id_cabang: 1)
+    (1, 'Arkananta Malik',    'Branch Manager'),
+    (1, 'Baskara Raditya',    'Staff Admin'),
+    (1, 'Damar Dewanka',      'Supervisor'),
+    -- Cabang SBY (id_cabang: 2)
+    (2, 'Elang Gibran',       'Branch Manager'),
+    (2, 'Gavin Mahendra',     'Staff Admin'),
+    (2, 'Kala Anaking',       'Supervisor'),
+    -- Cabang MJK (id_cabang: 3)
+    (3, 'Narendra Danadyaksa','Branch Manager'),
+    (3, 'Rayyan Danendra',    'Staff Admin'),
+    (3, 'Satria Aksara',      'Supervisor');
+
+
+-- ------------------------------------------------------------
+--  3. PENGGUNA
+-- ------------------------------------------------------------
+
+5 nama laki laki dan 5 nama perempuan 
+
+CREATE TABLE pengguna (
+    id_pengguna            INT AUTO_INCREMENT PRIMARY KEY,
+    kartu_identitas        VARCHAR(20)  NOT NULL UNIQUE,
+    nomor_telepon          VARCHAR(15)  NOT NULL,
+    nama_lengkap           VARCHAR(100) NOT NULL,
+    nomor_sim              VARCHAR(20)  NOT NULL,
+    tanggal_kadaluarsa_sim DATE         NOT NULL,
+    status_verifikasi      ENUM('belum_diverifikasi','terverifikasi','ditolak','expired')
+                           NOT NULL DEFAULT 'belum_diverifikasi'
+);
+
+INSERT INTO pengguna (kartu_identitas, nomor_telepon, nama_lengkap, nomor_sim, tanggal_kadaluarsa_sim, status_verifikasi) VALUES
+    -- Laki-laki
+    ('3515011203000001', '081234567890', 'Aksa Sadajiwa',    '950112345678', '2028-03-12', 'terverifikasi'),
+    ('3515011507010002', '081345678901', 'Bumi Semesta',     '960712345679', '2029-07-15', 'terverifikasi'),
+    ('3515012210990003', '081456789012', 'Kala Argantara',   '991012345680', '2027-10-22', 'belum_diverifikasi'),
+    ('3515010505980004', '081567890123', 'Renjana Arutala',  '980512345681', '2025-05-05', 'expired'),
+    ('3515013011020005', '081678901234', 'Abisatya Hanasta', '021112345682', '2030-11-30', 'terverifikasi'),
+    -- Perempuan
+    ('3515012104020006', '081789012345', 'Asmaralaya Citra', '020412345683', '2029-04-21', 'terverifikasi'),
+    ('3515011708000007', '081890123456', 'Lintang Amreta',   '000812345684', '2028-08-17', 'terverifikasi'),
+    ('3515010205010008', '081901234567', 'Niskala Arunika',  '010512345685', '2027-05-02', 'belum_diverifikasi'),
+    ('3515011402030009', '081212345678', 'Raya Nayaka',      '030212345686', '2024-02-14', 'ditolak'),
+    ('3515012512990010', '081313456789', 'Gendis Kirana',    '991212345687', '2028-12-25', 'terverifikasi');
+
+
+-- ------------------------------------------------------------
+--  4. KENDARAAN
+-- ------------------------------------------------------------
+
+Per cabang ada 5 kendaraan
+Merk model pakai merk & model motor karena ini rental motor
+Per 5 kendaraan itu kasih satu yang statusnya disewa dan dalam_perbaikan 
+
+CREATE TABLE kendaraan (
+    id_kendaraan     INT AUTO_INCREMENT PRIMARY KEY,
+    id_cabang        INT           NOT NULL,
+    merek            VARCHAR(50)   NOT NULL,
+    model            VARCHAR(50)   NOT NULL,
+    tahun            YEAR          NOT NULL,
+    nomor_polisi     VARCHAR(15)   NOT NULL UNIQUE,
+    tarif_per_hari   DECIMAL(10,2) NOT NULL,
+    status_kendaraan ENUM('tersedia','disewa','dalam_perbaikan')
+                     NOT NULL DEFAULT 'tersedia',
+    FOREIGN KEY (id_cabang) REFERENCES cabang(id_cabang)
+);
+
+INSERT INTO kendaraan (id_cabang, merek, model, tahun, nomor_polisi, tarif_per_hari, status_kendaraan) VALUES
+    -- Cabang SDJ (id_cabang: 1)
+    (1, 'Honda',  'Beat Fi',        2018, 'W 4123 AB', 50000.00, 'tersedia'),
+    (1, 'Honda',  'Vario 150',      2021, 'W 5234 CD', 75000.00, 'tersedia'),
+    (1, 'Yamaha', 'Mio M3',         2019, 'W 6345 EF', 55000.00, 'tersedia'),
+    (1, 'Yamaha', 'NMAX',           2022, 'W 2456 GH', 90000.00, 'disewa'),
+    (1, 'Honda',  'Scoopy All New', 2020, 'W 3567 IJ', 65000.00, 'dalam_perbaikan'),
+    -- Cabang SBY (id_cabang: 2)
+    (2, 'Honda',  'Beat Street',  2020, 'L 2189 ZA', 60000.00, 'tersedia'),
+    (2, 'Honda',  'Vario 160',    2023, 'L 3290 XB', 85000.00, 'tersedia'),
+    (2, 'Yamaha', 'Fazzio',       2022, 'L 4301 WC', 75000.00, 'tersedia'),
+    (2, 'Yamaha', 'Aerox 155',    2021, 'L 5412 VD', 85000.00, 'disewa'),
+    (2, 'Honda',  'Supra X 125',  2017, 'L 6523 UE', 45000.00, 'dalam_perbaikan'),
+    -- Cabang MJK (id_cabang: 3)
+    (3, 'Honda',  'Genio',        2021, 'S 3145 OP', 65000.00, 'tersedia'),
+    (3, 'Yamaha', 'Gear 125',     2022, 'S 4256 QR', 60000.00, 'tersedia'),
+    (3, 'Honda',  'Scoopy Fi',    2018, 'S 5367 ST', 55000.00, 'tersedia'),
+    (3, 'Yamaha', 'NMAX',         2020, 'S 6478 UV', 80000.00, 'disewa'),
+    (3, 'Honda',  'Beat Sporty',  2019, 'S 7589 WX', 50000.00, 'dalam_perbaikan');
+
+
+-- ------------------------------------------------------------
+--  5. PENYEWAAN
+-- ------------------------------------------------------------
+
+id_pengguna yang ‘terverifikasi’ ada 1, 2, 5, 6, 7, 10, total ada 6 pengguna
+id kendaraan yang ‘tersedia’ ada 
+1, 2, 3 untuk id karyawan 1, 2, 3 cabang sdj. 
+6, 7, 8 untuk id karyawan 4, 5, 6 cabang sby. 
+11, 12, 13 untuk id karyawan 7, 8, 9 cabang mjk.
+tiap cabang buat ada dua pengguna yang menyewa
+
+CREATE TABLE penyewaan (
+    id_penyewaan          INT AUTO_INCREMENT PRIMARY KEY,
+    id_pengguna           INT  NOT NULL,
+    id_kendaraan          INT  NOT NULL,
+    id_karyawan           INT  NOT NULL,
+    waktu_mulai           DATE NOT NULL,
+    waktu_selesai_rencana DATE NOT NULL,
+    status_penyewaan      ENUM('aktif','selesai','dibatalkan')
+                          NOT NULL DEFAULT 'aktif',
+    FOREIGN KEY (id_pengguna)  REFERENCES pengguna(id_pengguna),
+    FOREIGN KEY (id_kendaraan) REFERENCES kendaraan(id_kendaraan),
+    FOREIGN KEY (id_karyawan)  REFERENCES karyawan(id_karyawan)
+);
+
+INSERT INTO penyewaan (id_pengguna, id_kendaraan, id_karyawan, waktu_mulai, waktu_selesai_rencana, status_penyewaan) VALUES
+    -- Cabang SDJ (karyawan: 1-3 | kendaraan: 1-3)
+    (1, 1, 1, '2026-06-01', '2026-06-03', 'selesai'),
+    (2, 2, 2, '2026-06-10', '2026-06-12', 'aktif'),
+    -- Cabang SBY (karyawan: 4-6 | kendaraan: 6-8)
+    (5, 6, 4, '2026-06-02', '2026-06-03', 'selesai'),
+    (6, 7, 5, '2026-06-11', '2026-06-14', 'aktif'),
+    -- Cabang MJK (karyawan: 7-9 | kendaraan: 11-13)
+    (7,  11, 7, '2026-05-28', '2026-05-29', 'selesai'),
+    (10, 12, 8, '2026-06-11', '2026-06-12', 'aktif');
+
+
+-- ------------------------------------------------------------
+--  6. PENGEMBALIAN
+-- ------------------------------------------------------------
+
+Dari tabel penyewaan, yang sudah selesai ada id 1, 3, 5 
+
+CREATE TABLE pengembalian (
+    id_pengembalian    INT AUTO_INCREMENT PRIMARY KEY,
+    id_penyewaan       INT  NOT NULL UNIQUE,
+    id_karyawan        INT  NOT NULL,
+    waktu_pengembalian DATE NOT NULL,
+    kondisi_kendaraan  TEXT NOT NULL,
+    FOREIGN KEY (id_penyewaan) REFERENCES penyewaan(id_penyewaan),
+    FOREIGN KEY (id_karyawan)  REFERENCES karyawan(id_karyawan)
+);
+
+INSERT INTO pengembalian (id_penyewaan, id_karyawan, waktu_pengembalian, kondisi_kendaraan) VALUES
+    -- id_penyewaan 1 → Cabang SDJ, dilayani Karyawan id 3
+    (1, 3, '2026-06-03', 'Kondisi mulus, bensin terisi penuh, mesin aman.'),
+    -- id_penyewaan 3 → Cabang SBY, dilayani Karyawan id 6
+    (3, 6, '2026-06-03', 'Ada baret halus di bagian spion kanan, fungsi normal.'),
+    -- id_penyewaan 5 → Cabang MJK, dilayani Karyawan id 9
+    (5, 9, '2026-05-29', 'Kondisi baik, ban belakang agak kurang angin tapi aman.');
+
+
+-- ------------------------------------------------------------
+--  7. PEMBAYARAN
+-- ------------------------------------------------------------
+
+CREATE TABLE pembayaran (
+    id_pembayaran     INT AUTO_INCREMENT PRIMARY KEY,
+    id_penyewaan      INT            NOT NULL UNIQUE,
+    tanggal_transaksi DATE           NOT NULL DEFAULT (CURRENT_DATE),
+    metode_pembayaran ENUM('transfer_bank','qris','tunai','kartu_debit','kartu_kredit') NOT NULL,
+    jumlah_pembayaran DECIMAL(12,2)  NOT NULL,
+    status_pembayaran ENUM('lunas','gagal') NOT NULL DEFAULT 'lunas',
+    FOREIGN KEY (id_penyewaan) REFERENCES penyewaan(id_penyewaan)
+);
+
+INSERT INTO pembayaran (id_penyewaan, tanggal_transaksi, metode_pembayaran, jumlah_pembayaran, status_pembayaran) VALUES
+    -- id_penyewaan 1 → Beat Fi @50.000 × 2 hari (1–3 Jun)
+    (1, '2026-06-01', 'transfer_bank', 100000.00, 'lunas'),
+    -- id_penyewaan 2 → Vario 150 @75.000 × 2 hari (10–12 Jun)
+    (2, '2026-06-10', 'qris',          150000.00, 'lunas'),
+    -- id_penyewaan 3 → Beat Street @60.000 × 1 hari (2–3 Jun)
+    (3, '2026-06-02', 'tunai',          60000.00, 'lunas'),
+    -- id_penyewaan 4 → Vario 160 @85.000 × 3 hari (11–14 Jun)
+    (4, '2026-06-11', 'transfer_bank', 255000.00, 'lunas'),
+    -- id_penyewaan 5 → Genio @65.000 × 1 hari (28–29 Mei)
+    (5, '2026-05-28', 'qris',           65000.00, 'lunas'),
+    -- id_penyewaan 6 → Gear 125 @60.000 × 1 hari (11–12 Jun)
+    (6, '2026-06-11', 'tunai',          60000.00, 'lunas');
+
+
+-- ------------------------------------------------------------
+--  8. DENDA
+-- ------------------------------------------------------------
+
+CREATE TABLE denda (
+    id_denda        INT AUTO_INCREMENT PRIMARY KEY,
+    id_pengembalian INT           NOT NULL,
+    id_karyawan     INT           NOT NULL,
+    alasan_denda    ENUM('kerusakan_kendaraan','pelanggaran_lalu_lintas','keterlambatan_pengembalian') NOT NULL,
+    nominal_denda   DECIMAL(12,2) NOT NULL,
+    keterangan      TEXT,
+    FOREIGN KEY (id_pengembalian) REFERENCES pengembalian(id_pengembalian),
+    FOREIGN KEY (id_karyawan)     REFERENCES karyawan(id_karyawan)
+);
+
+INSERT INTO denda (id_pengembalian, id_karyawan, alasan_denda, nominal_denda, keterangan) VALUES
+(1, 3, 'kerusakan_kendaraan', 500000.00, 'Spion kanan pecah dan goresan pada pintu samping'),
+(2, 6, 'pelanggaran_lalu_lintas', 250000.00, 'Terkena e-tilang karena melanggar lampu merah'),
+(3, 9, 'kerusakan_kendaraan', 1200000.00, 'Bumper depan penyok cukup dalam');
