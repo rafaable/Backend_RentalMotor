@@ -423,179 +423,67 @@ def update_pengguna(
     finally:
         conn.close()
 
-@router.delete("/")
-def delete_pengguna(
-    id_pengguna: int = None,
-    nama_lengkap: str = None,
-    tahun_kadaluarsa: int = None,
-    tahun_awal: int = None,
-    tahun_akhir: int = None,
-    status_verifikasi: str = None
-):
+        
+@router.delete("/{id_pengguna}")
+def delete_pengguna(id_pengguna: int):
+
     conn = get_connection()
 
     try:
 
         with conn.cursor() as cursor:
 
-            # WAJIB ADA FILTER
+            # CEK ID ADA ATAU TIDAK
 
-            if all([
-                id_pengguna is None,
-                nama_lengkap is None,
-                tahun_kadaluarsa is None,
-                tahun_awal is None,
-                tahun_akhir is None,
-                status_verifikasi is None
-            ]):
-                return {
-                    "message": "Minimal satu filter harus diisi"
-                }
-
-            # VALIDASI RENTANG TAHUN
-
-            if (
-                tahun_awal is not None
-                and tahun_akhir is not None
-                and tahun_awal > tahun_akhir
-            ):
-                return {
-                    "message": "Batas atas bawah tahun melebihi batas atas!"
-                }
-
-            query = """
-                SELECT *
+            cursor.execute(
+                """
+                SELECT id_pengguna
                 FROM pengguna
-                WHERE 1=1
-            """
+                WHERE id_pengguna = %s
+                """,
+                (id_pengguna,)
+            )
 
-            params = []
+            pengguna = cursor.fetchone()
 
-            # ID
-
-            if id_pengguna is not None:
-                query += " AND id_pengguna = %s"
-                params.append(id_pengguna)
-
-            # NAMA LIKE CASE INSENSITIVE
-
-            if nama_lengkap:
-                query += """
-                    AND LOWER(nama_lengkap)
-                    LIKE LOWER(%s)
-                """
-                params.append(f"%{nama_lengkap}%")
-
-            # TAHUN KADALUARSA
-
-            if tahun_kadaluarsa is not None:
-                query += """
-                    AND YEAR(tanggal_kadaluarsa_sim) = %s
-                """
-                params.append(tahun_kadaluarsa)
-
-            # RENTANG TAHUN
-
-            if (
-                tahun_awal is not None
-                and tahun_akhir is not None
-            ):
-                query += """
-                    AND YEAR(tanggal_kadaluarsa_sim)
-                    BETWEEN %s AND %s
-                """
-                params.extend([
-                    tahun_awal,
-                    tahun_akhir
-                ])
-
-            # STATUS
-
-            if status_verifikasi:
-                query += """
-                    AND status_verifikasi = %s
-                """
-                params.append(status_verifikasi)
-
-            cursor.execute(query, params)
-
-            target_data = cursor.fetchall()
-
-            if not target_data:
+            if not pengguna:
                 return {
                     "message": "Not found"
                 }
 
-            deleted = []
-            failed = []
+            # CEK RELASI KE PENYEWAAN
 
-            for row in target_data:
+            cursor.execute(
+                """
+                SELECT id_penyewaan
+                FROM penyewaan
+                WHERE id_pengguna = %s
+                LIMIT 1
+                """,
+                (id_pengguna,)
+            )
 
-                id_user = row[0]
+            penyewaan = cursor.fetchone()
 
-                data_pengguna = {
-                    "id_pengguna": row[0],
-                    "kartu_identitas": row[1],
-                    "nomor_telepon": row[2],
-                    "nama_lengkap": row[3],
-                    "nomor_sim": row[4],
-                    "tanggal_kadaluarsa_sim": str(row[5]),
-                    "status_verifikasi": row[6]
+            if penyewaan:
+                return {
+                    "message": "Failed : Memiliki entri di tabel lain"
                 }
 
-                # CEK RELASI KE PENYEWAAN
+            # DELETE
 
-                cursor.execute(
-                    """
-                    SELECT id_penyewaan
-                    FROM penyewaan
-                    WHERE id_pengguna = %s
-                    LIMIT 1
-                    """,
-                    (id_user,)
-                )
-
-                data_penyewaan = cursor.fetchone()
-
-                if data_penyewaan:
-
-                    failed.append(data_pengguna)
-
-                else:
-
-                    cursor.execute(
-                        """
-                        DELETE FROM pengguna
-                        WHERE id_pengguna = %s
-                        """,
-                        (id_user,)
-                    )
-
-                    deleted.append(data_pengguna)
+            cursor.execute(
+                """
+                DELETE FROM pengguna
+                WHERE id_pengguna = %s
+                """,
+                (id_pengguna,)
+            )
 
             conn.commit()
 
-            if not deleted and failed:
-                return {
-                    "message": "Failed : Memiliki entri di tabel lain",
-                    "data": failed
-                }
-
-            if deleted and not failed:
-                return {
-                    "message": "Deleted",
-                    "data": deleted
-                }
-
             return {
-                "deleted": {
-                    "message": "Deleted",
-                    "data": deleted
-                },
-                "failed": {
-                    "message": "Failed : Memiliki entri di tabel lain",
-                    "data": failed
-                }
+                "message": "Deleted"
             }
 
     finally:
