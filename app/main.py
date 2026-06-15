@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from app.routes import pengguna
 from app.routes import cabang
+from app.routes import karyawan
 
 app = FastAPI()
 
@@ -11,3 +12,9 @@ app.include_router(
 )
 
 app.include_router(cabang.router)
+
+app.include_router(
+    karyawan.router,
+    prefix="/karyawan",
+    tags=["Karyawan"]
+)
