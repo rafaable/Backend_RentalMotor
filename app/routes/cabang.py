@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Query, Body
 from app.core.sql_connection import get_connection
+from app.schemas.cabang_schema import CabangPatch
 
 router = APIRouter(prefix="/cabang", tags=["Cabang"])
 
@@ -105,6 +106,198 @@ def create_cabang(
                     "alamat": alamat,
                     "kota": kota
                 }
+            }
+
+    finally:
+        conn.close()
+
+
+@router.patch("/{id_cabang}")
+def update_cabang(
+    id_cabang: int,
+    data: CabangPatch
+):
+
+    conn = get_connection()
+
+    try:
+        data = data.model_dump(exclude_none=True)
+
+        with conn.cursor() as cursor:
+
+            # CEK ID
+            cursor.execute(
+                """
+                SELECT *
+                FROM cabang
+                WHERE id_cabang = %s
+                """,
+                (id_cabang,)
+            )
+
+            cabang = cursor.fetchone()
+
+            if not cabang:
+                return {
+                    "message": "ID not found"
+                }
+
+            # FIELD YANG BOLEH DIUPDATE
+            allowed_fields = {
+                "nama_cabang",
+                "alamat",
+                "kota"
+            }
+
+            # CEK FIELD INVALID
+            for field in data.keys():
+
+                if field == "id_cabang":
+                    return {
+                        "message": "field tidak valid"
+                    }
+
+                if field not in allowed_fields:
+                    return {
+                        "message": "field tidak valid"
+                    }
+
+            # VALIDASI SATU PER SATU
+            if "nama_cabang" in data:
+
+                nama_cabang = str(data["nama_cabang"])
+
+                if not nama_cabang.strip():
+                    return {
+                        "message": "Nama cabang tidak valid!"
+                    }
+
+                if len(nama_cabang) > 100:
+                    return {
+                        "message": "Nama cabang terlalu panjang!"
+                    }
+
+            if "alamat" in data:
+
+                alamat = str(data["alamat"])
+
+                if not alamat.strip():
+                    return {
+                        "message": "Alamat tidak valid!"
+                    }
+
+            if "kota" in data:
+
+                kota = str(data["kota"])
+
+                if not kota.strip():
+                    return {
+                        "message": "Kota tidak valid!"
+                    }
+
+                if len(kota) > 50:
+                    return {
+                        "message": "Nama kota terlalu panjang!"
+                    }
+
+            # BUILD QUERY DINAMIS
+
+            update_fields = []
+            values = []
+
+            for key, value in data.items():
+
+                update_fields.append(f"{key} = %s")
+                values.append(value)
+
+            values.append(id_cabang)
+
+            query = f"""
+                UPDATE cabang
+                SET {', '.join(update_fields)}
+                WHERE id_cabang = %s
+            """
+
+            cursor.execute(query, values)
+
+            conn.commit()
+
+            return {
+                "message": "Data cabang berhasil diperbarui!"
+            }
+
+    finally:
+        conn.close()
+
+
+@router.delete("/{id_cabang}")
+def delete_cabang(id_cabang: int):
+
+    conn = get_connection()
+
+    try:
+        with conn.cursor() as cursor:
+
+            # CEK ID
+            cursor.execute(
+                """
+                SELECT *
+                FROM cabang
+                WHERE id_cabang = %s
+                """,
+                (id_cabang,)
+            )
+
+            cabang = cursor.fetchone()
+
+            if not cabang:
+                return {
+                    "message": "ID not found"
+                }
+
+            # CEK RELASI KE KARYAWAN
+            cursor.execute(
+                """
+                SELECT id_karyawan
+                FROM karyawan
+                WHERE id_cabang = %s
+                """,
+                (id_cabang,)
+            )
+
+            if cursor.fetchone():
+                return {
+                    "message": "Tidak bisa hapus cabang, masih ada karyawan terkait!"
+                }
+
+            # CEK RELASI KE KENDARAAN
+            cursor.execute(
+                """
+                SELECT id_kendaraan
+                FROM kendaraan
+                WHERE id_cabang = %s
+                """,
+                (id_cabang,)
+            )
+
+            if cursor.fetchone():
+                return {
+                    "message": "Tidak bisa hapus cabang, masih ada kendaraan terkait!"
+                }
+
+            # DELETE DATA
+            cursor.execute(
+                """
+                DELETE FROM cabang
+                WHERE id_cabang = %s
+                """,
+                (id_cabang,)
+            )
+
+            conn.commit()
+
+            return {
+                "message": "Data cabang berhasil dihapus!"
             }
 
     finally:
