@@ -279,3 +279,24 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+
+-- ----------------------------------------------------------------------------------
+--  TRIGGERS insert penyewaan : cek verifikasi pengguna & ubah status kendaraan
+-- ----------------------------------------------------------------------------------
+
+DELIMITER $$
+
+CREATE TRIGGER after_insert_penyewaan
+AFTER INSERT
+ON penyewaan
+FOR EACH ROW
+BEGIN
+
+    UPDATE kendaraan
+    SET status_kendaraan = 'disewa'
+    WHERE id_kendaraan = NEW.id_kendaraan;
+
+END$$
+
+DELIMITER ;gg
