@@ -16,6 +16,7 @@ app.include_router(
     penyewaan.router,
     prefix="/penyewaan",
     tags=["Penyewaan"]
+)
 app.include_router(cabang.router)
 
 app.include_router(
