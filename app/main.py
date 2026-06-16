@@ -5,6 +5,7 @@ from app.routes import penyewaan
 from app.routes import pengembalian
 from app.routes import karyawan
 from app.routes import denda
+from app.routes import kendaraan
 
 app = FastAPI()
 
@@ -42,4 +43,10 @@ app.include_router(
     denda.router,
     prefix="/denda",
     tags=["Denda"]
+)
+
+app.include_router(
+    kendaraan.router,
+    prefix="/kendaraan",
+    tags=["Kendaraan"]
 )
