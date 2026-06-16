@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from datetime import date
 from enum import Enum
-
+from typing import Optional
 
 class MetodePembayaran(str, Enum):
     transfer_bank = "transfer_bank"
@@ -21,3 +21,8 @@ class PembayaranCreate(BaseModel):
     tanggal_transaksi: date
     metode_pembayaran: MetodePembayaran
     status_pembayaran: StatusPembayaran
+
+class PembayaranPatch(BaseModel):
+    tanggal_transaksi: Optional[str] = None
+    metode_pembayaran: Optional[str] = None
+    status_pembayaran: Optional[str] = None
