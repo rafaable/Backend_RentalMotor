@@ -243,64 +243,6 @@ INSERT INTO denda (id_pengembalian, id_karyawan, alasan_denda, nominal_denda, ke
 (2, 6, 'pelanggaran_lalu_lintas', 250000.00, 'Terkena e-tilang karena melanggar lampu merah'),
 (3, 9, 'kerusakan_kendaraan', 1200000.00, 'Bumper depan penyok cukup dalam');
 
-
--- ------------------------------------------------------------
---  TRIGGERS untuk SIM Ditolak & Expired
--- ------------------------------------------------------------
-
-DROP TRIGGER IF EXISTS trg_pengguna_validasi_sim;
-
-DELIMITER $$
-
-CREATE TRIGGER trg_pengguna_validasi_sim
-AFTER INSERT
-ON pengguna
-FOR EACH ROW
-BEGIN
-
-    -- SIM sudah kadaluarsa
-    IF NEW.tanggal_kadaluarsa_sim < CURDATE() THEN
-
-        UPDATE pengguna
-        SET status_verifikasi = 'expired'
-        WHERE id_pengguna = NEW.id_pengguna;
-
-    END IF;
-
-    -- SIM lebih dari 5 tahun dari hari ini
-    IF NEW.tanggal_kadaluarsa_sim > DATE_ADD(CURDATE(), INTERVAL 5 YEAR) THEN
-
-        UPDATE pengguna
-        SET status_verifikasi = 'ditolak'
-        WHERE id_pengguna = NEW.id_pengguna;
-
-    END IF;
-
-END$$
-
-DELIMITER ;
-
-
--- ----------------------------------------------------------------------------------
---  TRIGGERS after insert penyewaan : ubah status kendaraan
--- ----------------------------------------------------------------------------------
-
-DELIMITER $$
-
-CREATE TRIGGER after_insert_penyewaan
-AFTER INSERT
-ON penyewaan
-FOR EACH ROW
-BEGIN
-
-    UPDATE kendaraan
-    SET status_kendaraan = 'disewa'
-    WHERE id_kendaraan = NEW.id_kendaraan;
-
-END$$
-
-DELIMITER ;
-
 -- ----------------------------------------------------------------------------------
 --  TRIGGERS after insert pengembalian : ubah status penyewaan & kendaraan
 -- ----------------------------------------------------------------------------------
@@ -335,7 +277,7 @@ END$$
 DELIMITER ;
 
 -- ----------------------------------------------------------------------------------
---  TRIGGERS after insert pengembalian : hitung denda keterlambatanh
+--  TRIGGERS after insert pengembalian : hitung denda keterlambatan
 -- ----------------------------------------------------------------------------------
 
 DROP TRIGGER IF EXISTS denda_keterlambatan;

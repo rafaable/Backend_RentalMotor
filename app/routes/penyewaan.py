@@ -316,6 +316,16 @@ def create_penyewaan(data: PenyewaanCreate):
                 )
             )
 
+            # UBAH STATUS KENDARAAN MENJADI DISEWA
+            cursor.execute(
+                """
+                UPDATE kendaraan
+                SET status_kendaraan = 'disewa'
+                WHERE id_kendaraan = %s
+                """,
+                (data.id_kendaraan,)
+            )
+
             conn.commit()
 
             return {
