@@ -163,8 +163,10 @@ def create_pengembalian(data: PengembalianCreate):
                 SELECT
                     p.id_penyewaan,
                     p.id_karyawan,
+                    p.id_kendaraan,
                     p.status_penyewaan,
                     p.waktu_mulai,
+                    p.waktu_selesai_rencana,
                     k.id_cabang
                 FROM penyewaan p
                 JOIN karyawan k
@@ -271,10 +273,88 @@ def create_pengembalian(data: PengembalianCreate):
             )
 
             id_pengembalian = cursor.lastrowid
+
+            # STATUS PENYEWAAN -> SELESAI
+
+            cursor.execute(
+                """
+                UPDATE penyewaan
+                SET status_penyewaan = 'selesai'
+                WHERE id_penyewaan = %s
+                """,
+                (data.id_penyewaan,)
+            )
+
+            # STATUS KENDARAAN -> TERSEDIA
+
+            cursor.execute(
+                """
+                UPDATE kendaraan
+                SET status_kendaraan = 'tersedia'
+                WHERE id_kendaraan = %s
+                """,
+                (penyewaan["id_kendaraan"],)
+            )
+
+            # CEK KETERLAMBATAN
+
+            if (
+                data.waktu_pengembalian
+                >
+                penyewaan["waktu_selesai_rencana"]
+            ):
+
+                selisih_hari = (
+                    data.waktu_pengembalian
+                    -
+                    penyewaan["waktu_selesai_rencana"]
+                ).days
+
+                # AMBIL TARIF KENDARAAN
+
+                cursor.execute(
+                    """
+                    SELECT tarif_per_hari
+                    FROM kendaraan
+                    WHERE id_kendaraan = %s
+                    """,
+                    (penyewaan["id_kendaraan"],)
+                )
+
+                kendaraan = cursor.fetchone()
+
+                nominal_denda = (
+                    selisih_hari
+                    * 1.5
+                    * float(kendaraan["tarif_per_hari"])
+                )
+
+                # INSERT DENDA
+
+                cursor.execute(
+                    """
+                    INSERT INTO denda
+                    (
+                        id_pengembalian,
+                        id_karyawan,
+                        alasan_denda,
+                        nominal_denda,
+                        keterangan
+                    )
+                    VALUES
+                    (%s,%s,%s,%s,%s)
+                    """,
+                    (
+                        id_pengembalian,
+                        data.id_karyawan,
+                        "keterlambatan_pengembalian",
+                        nominal_denda,
+                        "-"
+                    )
+                )
             conn.commit()
 
             # AMBIL DATA KARYAWAN UNTUK LOG
-
             cursor.execute(
                 """
                 SELECT
