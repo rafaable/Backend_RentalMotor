@@ -198,6 +198,21 @@ def create_pengguna(data: PenggunaCreate):
                     "message": "Nomor SIM duplikat!"
                 }
 
+            today = date.today()
+
+            # TENTUKAN STATUS VERIFIKASI OTOMATIS
+            status_verifikasi = data.status_verifikasi.value
+
+            if data.tanggal_kadaluarsa_sim <= today:
+                status_verifikasi = "expired"
+
+            elif data.tanggal_kadaluarsa_sim > date(
+                today.year + 5,
+                today.month,
+                today.day
+            ):
+                status_verifikasi = "ditolak"
+
             # INSERT DATA
             cursor.execute(
                 """
@@ -219,34 +234,25 @@ def create_pengguna(data: PenggunaCreate):
                     data.nama_lengkap.strip(),
                     data.nomor_sim,
                     data.tanggal_kadaluarsa_sim,
-                    data.status_verifikasi.value
+                    status_verifikasi
                 )
             )
 
             conn.commit()
 
-        # WARNING
-        today = date.today()
+            if status_verifikasi == "expired":
+                return {
+                    "message": "Data pengguna berhasil ditambahkan, status : expired"
+                }
 
-        if data.tanggal_kadaluarsa_sim < today:
+            if status_verifikasi == "ditolak":
+                return {
+                    "message": "Data pengguna berhasil ditambahkan, status : ditolak"
+                }
+
             return {
-                "message": "Data pengguna berhasil ditambahkan",
-                "warning": "Kartu SIM kadaluarsa!"
+                "message": "Data pengguna berhasil ditambahkan"
             }
-
-        if data.tanggal_kadaluarsa_sim > date(
-            today.year + 5,
-            today.month,
-            today.day
-        ):
-            return {
-                "message": "Data pengguna berhasil ditambahkan",
-                "warning": "Kartu SIM tidak valid!"
-            }
-
-        return {
-            "message": "Data pengguna berhasil ditambahkan"
-        }
 
     finally:
         conn.close()
@@ -369,7 +375,7 @@ def update_pengguna(
                 except ValueError:
 
                     return {
-                        "message": "tanggal kadaluarsa tidak valid!"
+                        "message": "Masukkan format tanggal YYYY-MM-DD"
                     }
 
                 today = date.today()
@@ -448,7 +454,7 @@ def delete_pengguna(id_pengguna: int):
 
             if not pengguna:
                 return {
-                    "message": "Not found"
+                    "message": "Data not found"
                 }
 
             # CEK RELASI KE PENYEWAAN

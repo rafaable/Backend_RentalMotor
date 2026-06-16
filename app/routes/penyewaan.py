@@ -33,38 +33,9 @@ def get_penyewaan(
 
             params = []
 
-            # FILTER ID PENYEWAAN
-            if id_penyewaan is not None:
-                query += """
-                    AND id_penyewaan = %s
-                """
-                params.append(id_penyewaan)
-
             # FILTER ID PENGGUNA
             if id_pengguna is not None:
-
-                cursor.execute(
-                    """
-                    SELECT status_verifikasi
-                    FROM pengguna
-                    WHERE id_pengguna = %s
-                    """,
-                    (id_pengguna,)
-                )
-
-                pengguna = cursor.fetchone()
-
-                if pengguna:
-
-                    if (
-                        pengguna["status_verifikasi"]
-                        != "terverifikasi"
-                    ):
-                        return {
-                            "message":
-                            "Input gagal, pengguna belum terverifikasi"
-                        }
-
+                
                 query += """
                     AND id_pengguna = %s
                 """
@@ -122,22 +93,22 @@ def get_penyewaan(
 
                 if id_penyewaan:
                     return {
-                        "message": "Not found!"
+                        "message": "id penyewaan not found!"
                     }
 
                 if id_pengguna:
                     return {
-                        "message": "Not found!"
+                        "message": "id pengguna not found!"
                     }
 
                 if id_kendaraan:
                     return {
-                        "message": "Not found!"
+                        "message": "id kendaraan not found!"
                     }
 
                 if id_karyawan:
                     return {
-                        "message": "Not found!"
+                        "message": "id karyawan not found!"
                     }
 
                 if (
@@ -146,12 +117,12 @@ def get_penyewaan(
                     waktu_kembali_up
                 ):
                     return {
-                        "message": "Not found!"
+                        "message": "date range not found!"
                     }
 
                 if status_penyewaan:
                     return {
-                        "message": "Not found!"
+                        "message": "status not found!"
                     }
 
                 return {

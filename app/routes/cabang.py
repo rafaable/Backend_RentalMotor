@@ -30,8 +30,8 @@ def get_cabang(
 
             # filter kota
             if kota:
-                query += " AND kota = %s"
-                params.append(kota)
+                query += " AND kota LIKE %s"
+                params.append(f"%{kota}%")
 
             cursor.execute(query, params)
             data = cursor.fetchall()
@@ -39,10 +39,10 @@ def get_cabang(
             if not data:
 
                 if id_cabang:
-                    return {"message": "id not found"}
+                    return {"message": "ID not found"}
 
                 if kota:
-                    return {"message": "Not found!"}
+                    return {"message": "Kota not found!"}
 
                 return {"message": "data pengguna kosong"}
 
@@ -149,19 +149,6 @@ def update_cabang(
                 "kota"
             }
 
-            # CEK FIELD INVALID
-            for field in data.keys():
-
-                if field == "id_cabang":
-                    return {
-                        "message": "field tidak valid"
-                    }
-
-                if field not in allowed_fields:
-                    return {
-                        "message": "field tidak valid"
-                    }
-
             # VALIDASI SATU PER SATU
             if "nama_cabang" in data:
 
@@ -267,7 +254,7 @@ def delete_cabang(id_cabang: int):
 
             if cursor.fetchone():
                 return {
-                    "message": "Tidak bisa hapus cabang, masih ada karyawan terkait!"
+                    "message": "Gagal hapus, id ini masih memiliki entri di tabel lain!!"
                 }
 
             # CEK RELASI KE KENDARAAN
@@ -282,7 +269,7 @@ def delete_cabang(id_cabang: int):
 
             if cursor.fetchone():
                 return {
-                    "message": "Tidak bisa hapus cabang, masih ada kendaraan terkait!"
+                    "message": "Gagal hapus, id ini masih memiliki entri di tabel lain!"
                 }
 
             # DELETE DATA
