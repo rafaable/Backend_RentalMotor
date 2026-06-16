@@ -183,7 +183,7 @@ def create_penyewaan(data: PenyewaanCreate):
         if data.status_penyewaan != "aktif":
 
             return {
-                "message": "Status penyewaan harus aktif"
+                "message": "Awal input, status penyewaan harus aktif"
             }
 
         with conn.cursor() as cursor:
@@ -455,7 +455,7 @@ def update_penyewaan(
 
                     return {
                         "message":
-                        "id_kendaraan tidak terdapat dalam entri!"
+                        "id_kendaraan tidak terdapat dalam daftar!"
                     }
 
                 if (
@@ -486,7 +486,7 @@ def update_penyewaan(
 
                     return {
                         "message":
-                        "id_karyawan tidak terdapat dalam entri!"
+                        "id_karyawan tidak terdapat dalam daftar!"
                     }
 
             # VALIDASI FORMAT TANGGAL
@@ -556,7 +556,6 @@ def update_penyewaan(
             if "status_penyewaan" in data:
 
                 valid_status = {
-                    "aktif",
                     "dibatalkan"
                 }
 
@@ -567,7 +566,7 @@ def update_penyewaan(
 
                     return {
                         "message":
-                        "Pilih salah satu dari status penyewaan berikut : aktif, dibatalkan"
+                        "Fitur ini hanya untuk mengubah status aktif menjadi dibatalkan!"
                     }
 
             # VALIDASI CABANG
