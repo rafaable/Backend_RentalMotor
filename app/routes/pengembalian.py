@@ -410,19 +410,6 @@ def update_pengembalian(
                         "Karyawan pengembalian harus berasal dari cabang yang sama dengan karyawan penyewaan!"
                     }
 
-            # VALIDASI KONDISI
-
-            if "kondisi_kendaraan" in data:
-
-                if not str(
-                    data["kondisi_kendaraan"]
-                ).strip():
-
-                    return {
-                        "message":
-                        "Kondisi kendaraan harus diisi!"
-                    }
-
             # BUILD QUERY DINAMIS
 
             update_fields = []
@@ -450,6 +437,48 @@ def update_pengembalian(
             )
 
             conn.commit()
+            
+            # LOG AKTIVITAS KE MONGODB
+
+            deskripsi_log = {}
+
+            # JIKA UPDATE KARYAWAN
+            if "id_karyawan" in data:
+
+                cursor.execute(
+                    """
+                    SELECT
+                        nama_karyawan,
+                        jabatan
+                    FROM karyawan
+                    WHERE id_karyawan = %s
+                    """,
+                    (data["id_karyawan"],)
+                )
+
+                karyawan_log = cursor.fetchone()
+
+                deskripsi_log["karyawan"] = {
+                    "id_karyawan": data["id_karyawan"],
+                    "nama": karyawan_log["nama_karyawan"],
+                    "jabatan": karyawan_log["jabatan"]
+                }
+
+            # JIKA UPDATE KONDISI
+            if "kondisi_kendaraan" in data:
+
+                deskripsi_log["kondisi"] = (
+                    data["kondisi_kendaraan"].strip()
+                )
+
+            log_aktivitas.insert_one(
+                {
+                    "timestamp": datetime.now(),
+                    "action": "update",
+                    "tabel": "pengembalian",
+                    "deskripsi": deskripsi_log
+                }
+            )
 
             return {
                 "message":
@@ -486,6 +515,28 @@ def delete_pengembalian(id_pengembalian: int):
                     "message": "ID not found"
                 }
 
+            # DATA UNTUK LOG
+
+            cursor.execute(
+                """
+                SELECT
+                    p.id_pengembalian,
+                    p.id_penyewaan,
+                    p.id_karyawan,
+                    p.waktu_pengembalian,
+                    p.kondisi_kendaraan,
+                    k.nama_karyawan,
+                    k.jabatan
+                FROM pengembalian p
+                JOIN karyawan k
+                    ON p.id_karyawan = k.id_karyawan
+                WHERE p.id_pengembalian = %s
+                """,
+                (id_pengembalian,)
+            )
+
+            deleted_data = cursor.fetchone()
+
             # CEK DENDA TERKAIT
 
             cursor.execute(
@@ -505,7 +556,6 @@ def delete_pengembalian(id_pengembalian: int):
                 }
 
             # DELETE
-
             cursor.execute(
                 """
                 DELETE FROM pengembalian
@@ -515,6 +565,32 @@ def delete_pengembalian(id_pengembalian: int):
             )
 
             conn.commit()
+
+            log_aktivitas.insert_one(
+                {
+                    "timestamp": datetime.now(),
+                    "action": "delete",
+                    "tabel": "pengembalian",
+                    "deleted": {
+                        "id_pengembalian":
+                            deleted_data["id_pengembalian"],
+                        "id_penyewaan":
+                            deleted_data["id_penyewaan"],
+                        "karyawan": {
+                            "id_karyawan":
+                                deleted_data["id_karyawan"],
+                            "nama":
+                                deleted_data["nama_karyawan"],
+                            "jabatan":
+                                deleted_data["jabatan"]
+                        },
+                        "waktu_pengembalian":
+                            str(deleted_data["waktu_pengembalian"]),
+                        "kondisi":
+                            deleted_data["kondisi_kendaraan"]
+                    }
+                }
+            )
 
             return {
                 "message": "Data penyewaan berhasil dihapus!"
