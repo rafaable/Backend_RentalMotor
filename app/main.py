@@ -6,6 +6,7 @@ from app.routes import pengembalian
 from app.routes import karyawan
 from app.routes import denda
 from app.routes import kendaraan
+from app.mongo import vehicle_condition, maintenance
 
 app = FastAPI()
 
@@ -49,4 +50,16 @@ app.include_router(
     kendaraan.router,
     prefix="/kendaraan",
     tags=["Kendaraan"]
+)
+
+app.include_router(
+    vehicle_condition.router,
+    prefix="/laporan-kondisi",
+    tags=["Laporan Kondisi"]
+)
+
+app.include_router(
+    maintenance.router,
+    prefix="/maintenance",
+    tags=["Maintenance"]
 )
