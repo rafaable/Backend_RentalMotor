@@ -1,5 +1,7 @@
 from fastapi import APIRouter
 from datetime import date
+from datetime import datetime
+from app.core.mongo_connection import log_aktivitas
 from app.core.sql_connection import get_connection
 from app.schemas.pengembalian_schema import PengembalianPatch
 from app.schemas.pengembalian_schema import PengembalianCreate
@@ -268,7 +270,44 @@ def create_pengembalian(data: PengembalianCreate):
                 )
             )
 
+            id_pengembalian = cursor.lastrowid
             conn.commit()
+
+            # AMBIL DATA KARYAWAN UNTUK LOG
+
+            cursor.execute(
+                """
+                SELECT
+                    nama_karyawan,
+                    jabatan
+                FROM karyawan
+                WHERE id_karyawan = %s
+                """,
+                (data.id_karyawan,)
+            )
+
+            karyawan_log = cursor.fetchone()
+
+            # LOG KE MONGODB
+
+            log_aktivitas.insert_one(
+                {
+                    "timestamp": datetime.now(),
+                    "action": "insert",
+                    "tabel": "pengembalian",
+                    "karyawan": {
+                        "id_karyawan": data.id_karyawan,
+                        "nama": karyawan_log["nama_karyawan"],
+                        "jabatan": karyawan_log["jabatan"]
+                    },
+                    "deskripsi": {
+                        "id_pengembalian": id_pengembalian,
+                        "id_penyewaan": data.id_penyewaan,
+                        "waktu_pengembalian": str(data.waktu_pengembalian),
+                        "kondisi": data.kondisi_kendaraan.strip()
+                    }
+                }
+            )
 
             return {
                 "message":
