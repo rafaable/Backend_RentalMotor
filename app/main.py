@@ -6,6 +6,7 @@ from app.routes import pengembalian
 from app.routes import karyawan
 from app.routes import denda
 from app.routes import kendaraan
+from app.routes import pembayaran
 
 app = FastAPI()
 
@@ -49,4 +50,10 @@ app.include_router(
     kendaraan.router,
     prefix="/kendaraan",
     tags=["Kendaraan"]
+)
+
+app.include_router(
+    pembayaran.router,
+    prefix="/pembayaran",
+    tags=["Pembayaran"]
 )
