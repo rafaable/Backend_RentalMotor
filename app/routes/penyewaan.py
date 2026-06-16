@@ -668,3 +668,87 @@ def update_penyewaan(
     finally:
 
         conn.close()
+
+
+@router.delete("/{id_penyewaan}")
+def delete_penyewaan(id_penyewaan: int):
+
+    conn = get_connection()
+
+    try:
+
+        with conn.cursor() as cursor:
+
+            # CEK ID PENYEWAAN
+            cursor.execute(
+                """
+                SELECT *
+                FROM penyewaan
+                WHERE id_penyewaan = %s
+                """,
+                (id_penyewaan,)
+            )
+
+            penyewaan = cursor.fetchone()
+
+            if not penyewaan:
+
+                return {
+                    "message": "ID not found"
+                }
+
+            # CEK PENGEMBALIAN TERKAIT
+            cursor.execute(
+                """
+                SELECT id_pengembalian
+                FROM pengembalian
+                WHERE id_penyewaan = %s
+                LIMIT 1
+                """,
+                (id_penyewaan,)
+            )
+
+            if cursor.fetchone():
+
+                return {
+                    "message":
+                    "Tidak bisa hapus penyewaan, masih ada pengembalian terkait!"
+                }
+
+            # CEK PEMBAYARAN TERKAIT
+            cursor.execute(
+                """
+                SELECT id_pembayaran
+                FROM pembayaran
+                WHERE id_penyewaan = %s
+                LIMIT 1
+                """,
+                (id_penyewaan,)
+            )
+
+            if cursor.fetchone():
+
+                return {
+                    "message":
+                    "Tidak bisa hapus penyewaan, masih ada pembayaran terkait!"
+                }
+
+            # HAPUS DATA
+            cursor.execute(
+                """
+                DELETE FROM penyewaan
+                WHERE id_penyewaan = %s
+                """,
+                (id_penyewaan,)
+            )
+
+            conn.commit()
+
+            return {
+                "message":
+                "Data penyewaan berhasil dihapus!"
+            }
+
+    finally:
+
+        conn.close()
