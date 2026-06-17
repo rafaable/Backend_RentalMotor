@@ -468,6 +468,45 @@ Bagian ini menjelaskan aturan validasi, penanganan error, dan logika bisnis yang
 - Menghapus data pembayaran secara permanen dari database.
 - Jika berhasil, pesan "Data pembayaran berhasil dihapus!"
 
+---
+
+## Tabel Denda
+
+**GET**
+- Hanya mengizinkan satu parameter pencarian pada satu waktu — jika lebih dari satu filter dikirimkan, pesan "Gunakan satu filter pencarian saja"
+- GET all — jika data kosong, pesan "Data denda kosong"
+- Berdasarkan id_denda — jika tidak ada, pesan "ID tidak ditemukan"
+- Berdasarkan id_pengembalian — sistem memvalidasi ketersediaan ID di tabel pengembalian; jika tidak ada, pesan "ID pengembalian tidak ditemukan". Jika ID ada namun belum memiliki denda, pesan "Data denda tidak ditemukan"
+- Berdasarkan alasan_denda (dropdown enum: kerusakan_kendaraan, pelanggaran_lalu_lintas, keterlambatan_pengembalian) — jika tidak ada, pesan "Data tidak ditemukan"
+- Berdasarkan keterangan (pencarian kata/LIKE) — jika kata tidak ditemukan, pesan "Keterangan tidak ditemukan"
+
+**POST**
+- Seluruh elemen wajib diisi kecuali keterangan (id_pengembalian, id_karyawan, alasan_denda, nominal_denda); jika ada yang kurang, pesan "Masukkan informasi secara lengkap!"
+- Pilihan alasan_denda dibatasi untuk input manual (enum: kerusakan_kendaraan, pelanggaran_lalu_lintas).
+- nominal_denda harus lebih besar dari 0 — jika kurang atau sama dengan 0, pesan "Nominal denda harus lebih dari 0!"
+- Menghindari spasi kosong: Jika keterangan diisi, tidak boleh hanya berisi karakter spasi/kosong — jika melanggar, pesan "Keterangan tidak valid!"
+- Mengecek ketersediaan id_pengembalian di tabel pengembalian — jika tidak terdaftar, pesan "ID pengembalian tidak ditemukan!"
+- Mengecek ketersediaan id_karyawan di tabel karyawan — jika tidak terdaftar, pesan "ID karyawan tidak ditemukan!"
+- Mencegah duplikasi data: Sistem memastikan satu transaksi pengembalian tidak boleh memiliki alasan denda yang sama lebih dari satu kali — jika duplikat, pesan "Alasan denda sudah terdaftar untuk pengembalian ini!"
+- Jika data berhasil ditambahkan, dikembalikan pesan "Data denda berhasil ditambahkan" beserta id_denda yang baru dibuat.
+
+**PATCH**
+- Berdasarkan id_denda — jika tidak ada di database, pesan "ID not found"
+- Field id_denda dan id_pengembalian dikunci dan tidak diizinkan untuk di-update.
+- Field yang diizinkan untuk di-update hanya id_karyawan, alasan_denda, nominal_denda, dan keterangan — jika ada field selain itu, pesan "field tidak valid"
+- Jika id_karyawan diubah, divalidasi ke tabel karyawan — jika tidak ada, pesan "ID karyawan tidak ditemukan!"
+- Jika nominal_denda diubah, nilainya harus lebih dari 0 — jika melanggar, pesan "Nominal denda harus lebih dari 0!"
+- Jika keterangan diubah, nilainya tidak boleh hanya berisi spasi kosong — jika melanggar, pesan "Keterangan tidak valid!"
+- Jika alasan_denda diubah (hanya menerima kerusakan_kendaraan atau pelanggaran_lalu_lintas), sistem kembali mengecek duplikasi pada ID pengembalian tersebut — jika duplikat, pesan "Alasan denda sudah terdaftar untuk pengembalian ini!"
+- Jika berhasil diperbarui, pesan "Data denda berhasil diperbarui!"
+
+**DELETE**
+- Berdasarkan id_denda — jika tidak ada di database, pesan "ID not found"
+- Menghapus data denda secara permanen dari tabel database.
+- Jika berhasil, pesan "Data denda berhasil dihapus!"
+
+---
+
 # Dokumentasi MongoDB - Sistem Rental Motor
 
 ## Struktur Collection MongoDB
