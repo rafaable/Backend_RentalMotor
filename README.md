@@ -427,3 +427,173 @@ Bagian ini menjelaskan aturan validasi, penanganan error, dan logika bisnis yang
 - Pencarian berdasarkan ID; jika tidak ditemukan, pesan "ID not found"
 - Jika pengembalian masih memiliki entri pada tabel denda, pesan "Tidak bisa hapus pengembalian, masih ada denda terkait!"
 - Jika berhasil terhapus, pesan "Data penyewaan berhasil dihapus!"
+
+# Dokumentasi MongoDB - Sistem Rental Motor
+
+## Struktur Collection MongoDB
+
+Sistem rental motor ini menggunakan **dua jenis database** secara bersamaan (*polyglot persistence*):
+- **MySQL** → data transaksional utama (cabang, karyawan, pengguna, kendaraan, penyewaan, pembayaran, pengembalian, denda)
+- **MongoDB** → data yang bersifat fleksibel, nested, dan variatif
+
+Bagian yang dikerjakan adalah perancangan dan implementasi **3 collection MongoDB** beserta backend API-nya.
+
+---
+
+## Collection 1: `laporan_kondisi`
+
+### Latar Belakang
+Tabel `pengembalian` di MySQL hanya menyimpan field `kondisi_kendaraan` berupa string sederhana. Padahal dalam praktiknya, laporan kondisi kendaraan membutuhkan pencatatan per bagian motor (body, spion, ban, lampu, dll) yang jumlah dan strukturnya berbeda-beda tiap kendaraan. Data ini tidak efisien jika dipaksakan ke dalam tabel relasional.
+
+### Keputusan Desain
+- **Embedding** untuk array `kondisi` karena data kondisi per bagian selalu dibaca bersama laporannya
+- **Referencing** untuk `id_penyewaan` dan `id_kendaraan` karena data aslinya sudah ada di tabel MySQL
+
+### Struktur Document
+```json
+{
+  "id_penyewaan": 1,
+  "id_kendaraan": 1,
+  "tipe": "check-in",
+  "tanggal_mulai": "2026-06-01",
+  "tanggal_selesai": "2026-06-03",
+  "kondisi": [
+    {
+      "bagian": "spion kanan",
+      "status": "rusak",
+      "deskripsi": "spion kanan pecah"
+    },
+    {
+      "bagian": "body depan",
+      "status": "normal",
+      "deskripsi": "tidak ada kerusakan"
+    }
+  ]
+}
+```
+
+### Fitur API
+| Method | Endpoint | Fungsi |
+|---|---|---|
+| GET | `/laporan-kondisi/` | Tampilkan semua laporan, bisa filter by `id_penyewaan`, `id_kendaraan`, `tipe`, `status_kondisi`, `tanggal_mulai`, `tanggal_selesai` |
+| POST | `/laporan-kondisi/` | Tambah laporan kondisi baru |
+| PATCH | `/laporan-kondisi/{id}` | Update laporan berdasarkan MongoDB `_id` |
+| DELETE | `/laporan-kondisi/{id}` | Hapus laporan berdasarkan MongoDB `_id` |
+
+---
+
+## Collection 2: `riwayat_maintenance`
+
+### Latar Belakang
+Data maintenance kendaraan tidak ada di ERD MySQL karena strukturnya sangat variatif — tiap servis bisa melibatkan komponen yang berbeda-beda, dengan tindakan dan biaya yang berbeda pula. Jumlah komponen yang ditangani tidak tetap tiap maintenance. Jika dipaksakan ke SQL, dibutuhkan tabel tambahan yang kompleks padahal data ini selalu dibaca bersama.
+
+### Keputusan Desain
+- **Embedding** untuk array `detail` karena komponen yang diservis selalu dibaca bersama data maintenance
+- **Referencing** untuk `id_kendaraan` dan `id_karyawan` karena data aslinya ada di tabel MySQL
+
+### Struktur Document
+```json
+{
+  "id_kendaraan": 5,
+  "id_karyawan": 3,
+  "tanggal": "2026-01-15",
+  "jenis_maintenance": "perbaikan_berat",
+  "status": "dalam_proses",
+  "detail": [
+    {
+      "komponen": "aki motor",
+      "tindakan": "ganti",
+      "keterangan": "aki soak, diganti aki baru GS Astra",
+      "biaya": 245000
+    },
+    {
+      "komponen": "sistem kelistrikan",
+      "tindakan": "perbaiki",
+      "keterangan": "urut kabel bodi jalur starter",
+      "biaya": 50000
+    }
+  ],
+  "total_biaya": 295000,
+  "catatan_tambahan": "menunggu proses pemasangan bodi motor kembali"
+}
+```
+
+### Fitur API
+| Method | Endpoint | Fungsi |
+|---|---|---|
+| GET | `/maintenance/` | Tampilkan semua maintenance, bisa filter by `id_kendaraan`, `id_karyawan`, `jenis_maintenance`, `status`, `tanggal` |
+| POST | `/maintenance/` | Tambah data maintenance baru |
+| PATCH | `/maintenance/{id}` | Update maintenance berdasarkan MongoDB `_id` |
+| DELETE | `/maintenance/{id}` | Hapus maintenance berdasarkan MongoDB `_id` |
+
+---
+
+## Collection 3: `log_aktivitas`
+
+### Latar Belakang
+Sistem membutuhkan **audit trail** — catatan semua aksi INSERT, UPDATE, DELETE yang terjadi pada tabel `penyewaan` dan `pengembalian`. Data log bersifat dinamis karena field `deskripsi` berbeda strukturnya tergantung jenis aksi dan tabel yang terlibat. Volume log juga tinggi dan tidak perlu di-JOIN dengan tabel lain, sehingga MongoDB lebih cocok daripada SQL.
+
+### Keputusan Desain
+- **Embedding** untuk field `karyawan` dan `deskripsi` karena selalu dibaca bersama log
+- Log **tidak memiliki endpoint sendiri** — diisi otomatis setiap kali ada aksi di `routes/penyewaan.py` dan `routes/pengembalian.py`
+
+### Struktur Document
+```json
+{
+  "timestamp": "2026-06-16T10:30:00",
+  "action": "insert",
+  "tabel": "penyewaan",
+  "karyawan": {
+    "id_karyawan": 2,
+    "nama": "Baskara Raditya",
+    "jabatan": "Staff Admin"
+  },
+  "deskripsi": {
+    "id_penyewaan": 7,
+    "id_pengguna": 1,
+    "id_kendaraan": 3,
+    "waktu_mulai": "2026-06-16",
+    "waktu_selesai_rencana": "2026-06-18",
+    "status_penyewaan": "aktif"
+  }
+}
+```
+
+### Cara Kerja
+Log tidak diisi manual oleh user. Setiap kali ada transaksi di MySQL (INSERT/UPDATE/DELETE penyewaan atau pengembalian), fungsi `log_aktivitas.insert_one()` otomatis dipanggil dari dalam routes SQL sehingga log tersimpan ke MongoDB secara real-time.
+
+---
+
+## Implementasi Backend
+
+Backend menggunakan **FastAPI** dengan **PyMongo** untuk koneksi ke MongoDB.
+
+Koneksi MongoDB dikelola di `core/mongo_connection.py`:
+```python
+from pymongo import MongoClient
+from app.core.config import *
+
+client = MongoClient(MONGO_URI)
+db = client[MONGO_DB]
+log_aktivitas = db["log_aktivitas"]
+```
+
+Konfigurasi disimpan di file `.env`:
+```
+MONGO_URI=mongodb://localhost:27017
+
+MONGO_DB=rental_motor
+```
+---
+
+## Justifikasi Pemilihan MongoDB
+
+| Data | Alasan MongoDB |
+|---|---|
+| `laporan_kondisi` | Array kondisi variatif, jumlah bagian berbeda tiap kendaraan, tidak efisien di SQL |
+| `riwayat_maintenance` | Array komponen variatif, jenis tindakan berbeda tiap servis, tidak efisien di SQL |
+| `log_aktivitas` | Field deskripsi berbeda tiap jenis aksi, volume tinggi, tidak perlu di-JOIN |
+
+
+| 2 | ID format tidak valid | `id=abc123` | `"Format ID tidak valid!"` |
+| 3 | ID tidak ditemukan | `id=6a311c4b9842e48fc7abc999` | `"Data maintenance tidak ditemukan!"` |
