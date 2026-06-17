@@ -507,6 +507,53 @@ Bagian ini menjelaskan aturan validasi, penanganan error, dan logika bisnis yang
 
 ---
 
+##Tabel Kendaraan 
+
+**GET**
+- GET all- jika data kosong, pesan "Data kendaraan kosong"
+- Berdasarkan id_kendaraan - jika tidak ditemukan, pesan "ID tidak ditemukan" 
+- Berdasarkan id_cabang - jika tidak ditemukan, pesan "Cabang tidak ditemukan"
+- Berdasarkan merek - jika tidak ditemukan, pesan "Merek tidak ditemukan"
+- Berdasarkan model - jika tidak ditemukan, pesan "Model tidak ditemukan"
+- Berdasarkan nomor_polisi - jika tidak ditemukan, pesan "Nomor polisi tidak ditemuka"
+- Berdasarkan tahun - jika tidak ditemukan, pesan "Tidak ada kendaraan untuk tahun tersebut"
+- Berdasarkan renatang tahun_awal dan tahun_akhir, jika `tahun_awal` > `tahun_akhir`, pesan "Rentang tahun tidak valid!", jika tidak ditemukan, pesan "Tidak ada kendaraan pada rentang tahun tersebut"
+- Berdasarkan rentang tarif tarif_min dan tarif_max, jika `tarif_min` > `tarif_max`, pesan "Rentang tarif tidak valid!", jika tidak ditemukan, pesan "Tidak ada kendaraan pada rentang tarif tersebut"
+- Berdasarkan status_kendaran terdapat enum (`tersedia`, `disewa`, `dalam_perbaikan`), jika tidak ditemukan, pesan "Tidak ada kendaraan dengan status tersebut" 
+
+**POST**
+- Seluruh elemen wajib diisi (not null), jika ada yang kurang, pesan "Masukkan informasi secara lengkap!"
+-  Berdasarkan merek tidak boleh kosong / hanya spasi, jika tidak pesan "Merek tidak boleh kosong!"
+- Berdasarkan model tidak boleh kosong / hanya spasi, jika tidak pesan "Model tidak boleh kosong!"
+- Berdasarkan nomor_polisi tidak boleh kosong / hanya spasi, jika tidak pesan "Nomor polisi tidak boleh kosong!"
+- Berdasarkan tahun harus berada di antara 1990 hingga tahun berjalan saat ini, jika tidak pesan "Tahun tidak valid!"
+- Berdasarkan tarif_per_hari harus berupa angka positif (lebih dari 0), jika tidak pesan "Tarif harus berupa angka positif!"
+- Berdasarkan id_cabang harus terdaftar di tabel cabang, jika tidak pesan "Cabang tidak ditemukan!"
+- Berdasarkan nomor_polisi harus unik; jika sudah terdaftar, pesan "Nomor polisi sudah terdaftar!"
+- Berdasarkan status_kendaraan harus sesuai enum (`tersedia`, `disewa`, `dalam_perbaikan`)
+- Jika berhasil ditambahkan, pesan "Data kendaraan berhasil ditambahkan!"
+
+**PATCH**
+- Pencarian berdasarkan id_kendaraan saja - jika tidak ada, pesan "ID tidak ditemukan"
+- Bisa update satu field, beberapa field, atau seluruh field sekaligus, sesuai dengan kebutuhan, tidak harus mengisi semuanya misal (satu, beberapa, atau seluruh kolom)
+- Berdasarkan merek tidak boleh kosong / hanya spasi, jika tidak pesan "Merek tidak boleh kosong!"
+- Berdasarkan model tidak boleh kosong / hanya spasi, jika tidak pesan "Model tidak boleh kosong!"
+- Berdasarkan nomor_polisi tidak boleh kosong / hanya spasi, jika tidak pesan "Nomor polisi tidak boleh kosong!"
+- Berdasarkan nomor_polisi harus unik (kecuali milik sendiri); jika sudah dipakai kendaraan lain, pesan "Nomor polisi sudah terdaftar!"
+- Berdasarkan tahun harus berada di antara 1990 hingga tahun berjalan saat ini, jika tidak pesan "Tahun tidak valid!"
+- Berdasarkan tarif_per_hari harus berupa angka positif (lebih dari 0), jika tidak pesan "Tarif harus berupa angka positif!"
+- Berdasarkan status_kendaraan harus sesuai enum (`tersedia`, `disewa`, `dalam_perbaikan`), jika tidak pesan "Status kendaraan tidak valid!"
+- Berdasarkan id_cabang harus terdaftar di tabel cabang, jika tidak pesan "Cabang tidak ditemukan!"
+- Jika update berhasil, pesan "Data kendaraan berhasil diperbarui!"
+
+**DELETE**
+- Tidak boleh delete tanpa filter karena seluruh data akan terhapus 
+- Delete berdasarkan id_kendaraan - jika tidak ada, pesan "ID tidak ditemukan" 
+- Cek Foreign Key di tabel penyewaan — jika id_kendaraan masih digunakan di data penyewaan, pesan "Tidak bisa hapus kendaraan, masih ada data penyewaan terkait!"
+- Jika hapus kendaraan berhasil, pesan "Data Kendaraan berhasil dihapus!"
+
+---
+
 # Dokumentasi MongoDB - Sistem Rental Motor
 
 ## Struktur Collection MongoDB
