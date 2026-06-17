@@ -428,6 +428,46 @@ Bagian ini menjelaskan aturan validasi, penanganan error, dan logika bisnis yang
 - Jika pengembalian masih memiliki entri pada tabel denda, pesan "Tidak bisa hapus pengembalian, masih ada denda terkait!"
 - Jika berhasil terhapus, pesan "Data penyewaan berhasil dihapus!"
 
+---
+
+### Tabel Pembayaran
+
+**GET**
+- GET all — jika data kosong, pesan "Data pembayaran kosong"
+- Berdasarkan id_pembayaran — jika tidak ada, pesan "ID pembayaran tidak ditemukan"
+- Berdasarkan id_penyewaan — jika tidak ada, pesan "ID penyewaan tidak ditemukan"
+- Berdasarkan tanggal_transaksi — jika tidak ada, pesan "Tanggal transaksi tidak ditemukan"
+- Berdasarkan tahun_transaksi — jika tidak ada, pesan "Tahun transaksi tidak ditemukan"
+- Berdasarkan metode_pembayaran (dropdown/enum) — jika tidak ada, pesan "Metode pembayaran tidak ditemukan"
+- Berdasarkan status_pembayaran (dropdown/enum) — jika tidak ada, pesan "Status pembayaran tidak ditemukan"
+- Berdasarkan jumlah_pembayaran — jika tidak ada, pesan "Jumlah pembayaran tidak ditemukan"
+- Setiap parameter id (id_pembayaran, id_penyewaan), dan tahun_transaksi harus berupa angka (integer).
+- tanggal_transaksi harus berformat date (YYYY-MM-DD), jika tidak sesuai maka sistem akan mengembalikan pesan error validasi bawaan.
+- jumlah_pembayaran harus berupa angka desimal (float).
+
+**POST**
+- Seluruh elemen wajib diisi (not null); validasi tipe data akan ditangani oleh schema.
+- Mengecek ketersediaan id_penyewaan di tabel penyewaan — jika tidak ada, pesan "ID penyewaan tidak ditemukan"
+- Dicek apakah status penyewaan yang bersangkutan adalah "aktif" — jika tidak, pesan "Pembayaran hanya bisa dilakukan untuk penyewaan yang masih aktif!"
+- Dipastikan bahwa satu penyewaan hanya bisa memiliki satu pembayaran (mencegah duplikat) — jika sudah ada, pesan "Penyewaan ini sudah memiliki pembayaran!"
+- tanggal_transaksi harus berformat date dan tidak boleh melebihi tanggal mulai sewa — jika melebihi, pesan "Tanggal transaksi tidak boleh melebihi tanggal mulai sewa!"
+- Sistem akan otomatis menghitung jumlah_pembayaran dengan mengalikan tarif kendaraan per hari dengan jumlah hari penyewaan.
+- Jika data berhasil ditambahkan, dikembalikan pesan "Data pembayaran berhasil ditambahkan" beserta hasil perhitungan jumlah pembayarannya.
+
+**PATCH**
+- Berdasarkan id_pembayaran — jika tidak ada di database, pesan "ID pembayaran tidak ditemukan"
+- Field yang diizinkan untuk di-update hanya tanggal_transaksi, metode_pembayaran, dan status_pembayaran — jika menginputkan field selain itu, pesan "field tidak valid"
+- tanggal_transaksi harus berformat date — jika formatnya salah, pesan "Format tanggal transaksi tidak valid
+- Jika tanggal_transaksi diubah, nilainya tetap tidak boleh melebihi tanggal mulai sewa — jika melanggar, pesan "Tanggal transaksi tidak boleh melebihi tanggal mulai sewa!"
+- metode_pembayaran harus sesuai pilihan enum (transfer_bank, qris, tunai, kartu_debit, kartu_kredit) — jika tidak sesuai, pesan "Metode pembayaran tidak sesuai pilihan yang tersedia"
+- status_pembayaran harus sesuai pilihan enum (lunas, gagal) — jika tidak sesuai, pesan "Status pembayaran tidak sesuai pilihan yang tersedia"
+- Jika berhasil diubah, pesan "Data pembayaran berhasil diperbarui!"
+
+**DELETE**
+- Berdasarkan id_pembayaran — jika tidak ada di database, pesan "ID pembayaran tidak ditemukan"
+- Menghapus data pembayaran secara permanen dari database.
+- Jika berhasil, pesan "Data pembayaran berhasil dihapus!"
+
 # Dokumentasi MongoDB - Sistem Rental Motor
 
 ## Struktur Collection MongoDB
