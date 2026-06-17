@@ -19,12 +19,12 @@ def get_kendaraan(
     tarif_max: float = None,
     status_kendaraan: StatusKendaraan = None
 ):
-    # VALIDASI RENTANG TAHUN
+    # VALIDASI RENTANG TAHUN (kalau keduanya diisi)
     if tahun_awal is not None and tahun_akhir is not None:
         if tahun_awal > tahun_akhir:
             return {"message": "Rentang tahun tidak valid!"}
 
-    # VALIDASI RENTANG TARIF
+    # VALIDASI RENTANG TARIF (kalau keduanya diisi)
     if tarif_min is not None and tarif_max is not None:
         if tarif_min > tarif_max:
             return {"message": "Rentang tarif tidak valid!"}
@@ -55,18 +55,32 @@ def get_kendaraan(
                 query += " AND tahun = %s"
                 params.append(tahun)
 
+            # RENTANG TAHUN - bisa salah satu atau keduanya
             if tahun_awal is not None and tahun_akhir is not None:
                 query += " AND tahun BETWEEN %s AND %s"
                 params.append(tahun_awal)
+                params.append(tahun_akhir)
+            elif tahun_awal is not None:
+                query += " AND tahun >= %s"
+                params.append(tahun_awal)
+            elif tahun_akhir is not None:
+                query += " AND tahun <= %s"
                 params.append(tahun_akhir)
 
             if nomor_polisi:
                 query += " AND nomor_polisi = %s"
                 params.append(nomor_polisi)
 
+            # RENTANG TARIF - bisa salah satu atau keduanya
             if tarif_min is not None and tarif_max is not None:
                 query += " AND tarif_per_hari BETWEEN %s AND %s"
                 params.append(tarif_min)
+                params.append(tarif_max)
+            elif tarif_min is not None:
+                query += " AND tarif_per_hari >= %s"
+                params.append(tarif_min)
+            elif tarif_max is not None:
+                query += " AND tarif_per_hari <= %s"
                 params.append(tarif_max)
 
             if status_kendaraan is not None:
@@ -89,9 +103,9 @@ def get_kendaraan(
                     return {"message": "Nomor polisi tidak ditemukan"}
                 if tahun is not None:
                     return {"message": "Tidak ada kendaraan untuk tahun tersebut"}
-                if tahun_awal is not None and tahun_akhir is not None:
+                if tahun_awal is not None or tahun_akhir is not None:
                     return {"message": "Tidak ada kendaraan pada rentang tahun tersebut"}
-                if tarif_min is not None and tarif_max is not None:
+                if tarif_min is not None or tarif_max is not None:
                     return {"message": "Tidak ada kendaraan pada rentang tarif tersebut"}
                 if status_kendaraan is not None:
                     return {"message": "Tidak ada kendaraan dengan status tersebut"}
@@ -100,7 +114,6 @@ def get_kendaraan(
             return data
     finally:
         conn.close()
-
 
 ##  POST Kendaraan 
 @router.post("/")
