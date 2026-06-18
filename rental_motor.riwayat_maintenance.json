@@ -1,0 +1,383 @@
+[{
+  "_id": {
+    "$oid": "6a311c4b9842e48fc7abc11a"
+  },
+  "id_kendaraan": 1,
+  "id_karyawan": 3,
+  "tanggal": "2026-01-05",
+  "jenis_maintenance": "servis_rutin",
+  "status": "selesai",
+  "detail": [
+    {
+      "komponen": "oli mesin",
+      "tindakan": "ganti",
+      "keterangan": "ganti oli standar",
+      "biaya": 65000
+    },
+    {
+      "komponen": "busi",
+      "tindakan": "ganti",
+      "keterangan": "busi baru NGK",
+      "biaya": 25000
+    }
+  ],
+  "total_biaya": 90000,
+  "catatan_tambahan": "mesin halus, siap jalan"
+},
+{
+  "_id": {
+    "$oid": "6a311c4b9842e48fc7abc11b"
+  },
+  "id_kendaraan": 2,
+  "id_karyawan": 3,
+  "tanggal": "2026-01-06",
+  "jenis_maintenance": "servis_rutin",
+  "status": "selesai",
+  "detail": [
+    {
+      "komponen": "oli mesin",
+      "tindakan": "ganti",
+      "keterangan": "ganti oli SPX2",
+      "biaya": 85000
+    },
+    {
+      "komponen": "filter udara",
+      "tindakan": "bersihkan",
+      "keterangan": "dibersihkan pakai kompresor",
+      "biaya": 15000
+    }
+  ],
+  "total_biaya": 100000,
+  "catatan_tambahan": "motor siap pakai, kondisi prima"
+},
+{
+  "_id": {
+    "$oid": "6a311c4b9842e48fc7abc11c"
+  },
+  "id_kendaraan": 3,
+  "id_karyawan": 2,
+  "tanggal": "2026-01-10",
+  "jenis_maintenance": "servis_rutin",
+  "status": "selesai",
+  "detail": [
+    {
+      "komponen": "oli mesin",
+      "tindakan": "ganti",
+      "keterangan": "ganti oli Yamalube Matik",
+      "biaya": 60000
+    },
+    {
+      "komponen": "v-belt",
+      "tindakan": "cek",
+      "keterangan": "kondisi masih layak",
+      "biaya": 0
+    }
+  ],
+  "total_biaya": 60000,
+  "catatan_tambahan": "aman digunakan pelajar"
+},
+{
+  "_id": {
+    "$oid": "6a311c4b9842e48fc7abc11d"
+  },
+  "id_kendaraan": 4,
+  "id_karyawan": 3,
+  "tanggal": "2026-01-12",
+  "jenis_maintenance": "servis_rutin",
+  "status": "selesai",
+  "detail": [
+    {
+      "komponen": "oli mesin",
+      "tindakan": "ganti",
+      "keterangan": "ganti oli matik besar",
+      "biaya": 95000
+    },
+    {
+      "komponen": "oli gardan",
+      "tindakan": "ganti",
+      "keterangan": "ganti oli gardan",
+      "biaya": 25000
+    },
+    {
+      "komponen": "kampas rem depan",
+      "tindakan": "ganti",
+      "keterangan": "ganti kampas baru",
+      "biaya": 60000
+    }
+  ],
+  "total_biaya": 180000,
+  "catatan_tambahan": "rem pakem, tarikan mantap"
+},
+{
+  "_id": {
+    "$oid": "6a311c4b9842e48fc7abc11e"
+  },
+  "id_kendaraan": 5,
+  "id_karyawan": 3,
+  "tanggal": "2026-01-15",
+  "jenis_maintenance": "perbaikan_berat",
+  "status": "selesai",
+  "detail": [
+    {
+      "komponen": "aki motor",
+      "tindakan": "ganti",
+      "keterangan": "aki soak, diganti aki baru GS Astra",
+      "biaya": 245000
+    },
+    {
+      "komponen": "sistem kelistrikan",
+      "tindakan": "perbaiki",
+      "keterangan": "urut kabel bodi jalur starter",
+      "biaya": 50000
+    }
+  ],
+  "total_biaya": 295000,
+  "catatan_tambahan": "menunggu proses pemasangan bodi motor kembali"
+},
+{
+  "_id": {
+    "$oid": "6a311c4b9842e48fc7abc11f"
+  },
+  "id_kendaraan": 6,
+  "id_karyawan": 6,
+  "tanggal": "2026-01-05",
+  "jenis_maintenance": "servis_rutin",
+  "status": "selesai",
+  "detail": [
+    {
+      "komponen": "oli mesin",
+      "tindakan": "ganti",
+      "keterangan": "ganti oli MPX2",
+      "biaya": 65000
+    },
+    {
+      "komponen": "roller CVT",
+      "tindakan": "ganti",
+      "keterangan": "ganti 1 set roller standar",
+      "biaya": 75000
+    }
+  ],
+  "total_biaya": 140000,
+  "catatan_tambahan": "tarikan gas sudah tidak gredek"
+},
+{
+  "_id": {
+    "$oid": "6a311c4b9842e48fc7abc120"
+  },
+  "id_kendaraan": 7,
+  "id_karyawan": 6,
+  "tanggal": "2026-01-08",
+  "jenis_maintenance": "servis_rutin",
+  "status": "selesai",
+  "detail": [
+    {
+      "komponen": "oli mesin",
+      "tindakan": "ganti",
+      "keterangan": "ganti oli SPX2",
+      "biaya": 85000
+    },
+    {
+      "komponen": "kampas rem belakang",
+      "tindakan": "ganti",
+      "keterangan": "kampas rem belakang baru",
+      "biaya": 55000
+    }
+  ],
+  "total_biaya": 140000,
+  "catatan_tambahan": "motor keluaran baru, mesin sangat prima"
+},
+{
+  "_id": {
+    "$oid": "6a311c4b9842e48fc7abc121"
+  },
+  "id_kendaraan": 8,
+  "id_karyawan": 5,
+  "tanggal": "2026-01-11",
+  "jenis_maintenance": "servis_rutin",
+  "status": "selesai",
+  "detail": [
+    {
+      "komponen": "oli mesin",
+      "tindakan": "ganti",
+      "keterangan": "ganti oli Yamalube",
+      "biaya": 65000
+    },
+    {
+      "komponen": "filter udara",
+      "tindakan": "ganti",
+      "keterangan": "ganti filter udara baru karena kotor",
+      "biaya": 45000
+    }
+  ],
+  "total_biaya": 110000,
+  "catatan_tambahan": "filtrasi udara optimal kembali"
+},
+{
+  "_id": {
+    "$oid": "6a311c4b9842e48fc7abc122"
+  },
+  "id_kendaraan": 9,
+  "id_karyawan": 6,
+  "tanggal": "2026-01-14",
+  "jenis_maintenance": "servis_rutin",
+  "status": "selesai",
+  "detail": [
+    {
+      "komponen": "oli mesin",
+      "tindakan": "ganti",
+      "keterangan": "ganti oli mesin sport matik",
+      "biaya": 95000
+    },
+    {
+      "komponen": "cairan radiator",
+      "tindakan": "kuras",
+      "keterangan": "kuras dan isi air radiator baru",
+      "biaya": 35000
+    }
+  ],
+  "total_biaya": 130000,
+  "catatan_tambahan": "suhu mesin stabil, siap sewa jarak jauh"
+},
+{
+  "_id": {
+    "$oid": "6a311c4b9842e48fc7abc123"
+  },
+  "id_kendaraan": 10,
+  "id_karyawan": 6,
+  "tanggal": "2026-01-18",
+  "jenis_maintenance": "perbaikan_berat",
+  "status": "dalam_proses",
+  "detail": [
+    {
+      "komponen": "ban belakang",
+      "tindakan": "ganti",
+      "keterangan": "ban botak, diganti ban tubeless FDR",
+      "biaya": 220000
+    },
+    {
+      "komponen": "gir set",
+      "tindakan": "ganti",
+      "keterangan": "gir dan rantai aus diganti 1 set Tajima",
+      "biaya": 165000
+    }
+  ],
+  "total_biaya": 385000,
+  "catatan_tambahan": "motor masih di atas paddock menunggu penyetelan rantai"
+},
+{
+  "_id": {
+    "$oid": "6a311c4b9842e48fc7abc124"
+  },
+  "id_kendaraan": 11,
+  "id_karyawan": 9,
+  "tanggal": "2026-01-04",
+  "jenis_maintenance": "servis_rutin",
+  "status": "selesai",
+  "detail": [
+    {
+      "komponen": "oli mesin",
+      "tindakan": "ganti",
+      "keterangan": "ganti oli MPX2",
+      "biaya": 65000
+    },
+    {
+      "komponen": "rem",
+      "tindakan": "cek",
+      "keterangan": "pembersihan debu kampas rem",
+      "biaya": 10000
+    }
+  ],
+  "total_biaya": 75000,
+  "catatan_tambahan": "motor irit, fungsional lancar"
+},
+{
+  "_id": {
+    "$oid": "6a311c4b9842e48fc7abc125"
+  },
+  "id_kendaraan": 12,
+  "id_karyawan": 9,
+  "tanggal": "2026-01-09",
+  "jenis_maintenance": "servis_rutin",
+  "status": "selesai",
+  "detail": [
+    {
+      "komponen": "oli mesin",
+      "tindakan": "ganti",
+      "keterangan": "ganti oli standar Yamaha",
+      "biaya": 60000
+    }
+  ],
+  "total_biaya": 60000,
+  "catatan_tambahan": "perawatan minimalis, performa stabil"
+},
+{
+  "_id": {
+    "$oid": "6a311c4b9842e48fc7abc126"
+  },
+  "id_kendaraan": 13,
+  "id_karyawan": 8,
+  "tanggal": "2026-01-12",
+  "jenis_maintenance": "servis_rutin",
+  "status": "selesai",
+  "detail": [
+    {
+      "komponen": "oli mesin",
+      "tindakan": "ganti",
+      "keterangan": "ganti oli SPX2",
+      "biaya": 85000
+    },
+    {
+      "komponen": "busi",
+      "tindakan": "ganti",
+      "keterangan": "ganti busi standar denso",
+      "biaya": 20000
+    }
+  ],
+  "total_biaya": 105000,
+  "catatan_tambahan": "vibe motor klasik terawat"
+},
+{
+  "_id": {
+    "$oid": "6a311c4b9842e48fc7abc127"
+  },
+  "id_kendaraan": 14,
+  "id_karyawan": 9,
+  "tanggal": "2026-01-15",
+  "jenis_maintenance": "servis_rutin",
+  "status": "selesai",
+  "detail": [
+    {
+      "komponen": "oli mesin",
+      "tindakan": "ganti",
+      "keterangan": "ganti oli matik besar",
+      "biaya": 95000
+    },
+    {
+      "komponen": "v-belt CVT",
+      "tindakan": "ganti",
+      "keterangan": "ganti v-belt kit original",
+      "biaya": 140000
+    }
+  ],
+  "total_biaya": 235000,
+  "catatan_tambahan": "habis servis besar bagian CVT, akselerasi mantap"
+},
+{
+  "_id": {
+    "$oid": "6a313ae7dd0d1256d6d32705"
+  },
+  "id_kendaraan": 1,
+  "id_karyawan": 3,
+  "tanggal": "2026-06-16",
+  "jenis_maintenance": "servis_rutin",
+  "status": "selesai",
+  "detail": [
+    {
+      "komponen": "oli mesin",
+      "tindakan": "ganti",
+      "keterangan": "ganti oli standar",
+      "biaya": 65000
+    }
+  ],
+  "total_biaya": 65000
+}]

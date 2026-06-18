@@ -1,0 +1,242 @@
+[{
+  "_id": {
+    "$oid": "6a311c4b9842e48fc7abc114"
+  },
+  "id_penyewaan": 1,
+  "id_kendaraan": 1,
+  "tipe": "check-in",
+  "tanggal_mulai": "2026-06-01",
+  "tanggal_selesai": "2026-06-03",
+  "kondisi": [
+    {
+      "bagian": "body depan",
+      "status": "normal",
+      "deskripsi": "tidak ada kerusakan"
+    },
+    {
+      "bagian": "body belakang",
+      "status": "normal",
+      "deskripsi": "tidak ada kerusakan"
+    },
+    {
+      "bagian": "spion kiri",
+      "status": "normal",
+      "deskripsi": "terpasang dengan baik"
+    },
+    {
+      "bagian": "spion kanan",
+      "status": "normal",
+      "deskripsi": "terpasang dengan baik"
+    },
+    {
+      "bagian": "ban depan",
+      "status": "normal",
+      "deskripsi": "tekanan angin 32 psi"
+    },
+    {
+      "bagian": "ban belakang",
+      "status": "normal",
+      "deskripsi": "tekanan angin 30 psi"
+    },
+    {
+      "bagian": "lampu depan",
+      "status": "normal",
+      "deskripsi": "berfungsi normal"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "6a311c4b9842e48fc7abc115"
+  },
+  "id_penyewaan": 1,
+  "id_kendaraan": 1,
+  "tipe": "check-out",
+  "tanggal_mulai": "2026-06-01",
+  "tanggal_selesai": "2026-06-03",
+  "kondisi": [
+    {
+      "bagian": "body depan",
+      "status": "normal",
+      "deskripsi": "tidak ada kerusakan"
+    },
+    {
+      "bagian": "body belakang",
+      "status": "normal",
+      "deskripsi": "tidak ada kerusakan"
+    },
+    {
+      "bagian": "spion kiri",
+      "status": "normal",
+      "deskripsi": "terpasang dengan baik"
+    },
+    {
+      "bagian": "spion kanan",
+      "status": "rusak",
+      "deskripsi": "spion kanan pecah"
+    },
+    {
+      "bagian": "body samping",
+      "status": "rusak",
+      "deskripsi": "goresan pada body samping"
+    },
+    {
+      "bagian": "ban depan",
+      "status": "normal",
+      "deskripsi": "tekanan angin 31 psi"
+    },
+    {
+      "bagian": "ban belakang",
+      "status": "normal",
+      "deskripsi": "tekanan angin 30 psi"
+    },
+    {
+      "bagian": "lampu depan",
+      "status": "normal",
+      "deskripsi": "berfungsi normal"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "6a311c4b9842e48fc7abc116"
+  },
+  "id_penyewaan": 3,
+  "id_kendaraan": 6,
+  "tipe": "check-in",
+  "tanggal_mulai": "2026-06-02",
+  "tanggal_selesai": "2026-06-03",
+  "kondisi": [
+    {
+      "bagian": "body depan",
+      "status": "normal",
+      "deskripsi": "tidak ada kerusakan"
+    },
+    {
+      "bagian": "spion kiri",
+      "status": "normal",
+      "deskripsi": "terpasang dengan baik"
+    },
+    {
+      "bagian": "spion kanan",
+      "status": "normal",
+      "deskripsi": "terpasang dengan baik"
+    },
+    {
+      "bagian": "body samping",
+      "status": "normal",
+      "deskripsi": "tidak ada goresan"
+    },
+    {
+      "bagian": "ban depan",
+      "status": "normal",
+      "deskripsi": "tekanan angin 32 psi"
+    },
+    {
+      "bagian": "ban belakang",
+      "status": "normal",
+      "deskripsi": "tekanan angin 30 psi"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "6a311c4b9842e48fc7abc117"
+  },
+  "id_penyewaan": 3,
+  "id_kendaraan": 6,
+  "tipe": "check-out",
+  "tanggal_mulai": "2026-06-02",
+  "tanggal_selesai": "2026-06-03",
+  "kondisi": [
+    {
+      "bagian": "body depan",
+      "status": "normal",
+      "deskripsi": "tidak ada kerusakan"
+    },
+    {
+      "bagian": "spion kiri",
+      "status": "normal",
+      "deskripsi": "terpasang dengan baik"
+    },
+    {
+      "bagian": "spion kanan",
+      "status": "rusak",
+      "deskripsi": "ada baret halus di bagian spion kanan, fungsi normal"
+    },
+    {
+      "bagian": "body samping",
+      "status": "normal",
+      "deskripsi": "tidak ada goresan"
+    },
+    {
+      "bagian": "ban depan",
+      "status": "normal",
+      "deskripsi": "tekanan angin 31 psi"
+    },
+    {
+      "bagian": "ban belakang",
+      "status": "normal",
+      "deskripsi": "kondisi baik"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "6a311c4b9842e48fc7abc118"
+  },
+  "id_penyewaan": 5,
+  "id_kendaraan": 11,
+  "tipe": "check-in",
+  "tanggal_mulai": "2026-05-28",
+  "tanggal_selesai": "2026-05-29",
+  "kondisi": [
+    {
+      "bagian": "body depan",
+      "status": "normal",
+      "deskripsi": "kondisi baik"
+    },
+    {
+      "bagian": "bumper depan",
+      "status": "normal",
+      "deskripsi": "tidak ada kerusakan"
+    },
+    {
+      "bagian": "spion kanan",
+      "status": "normal",
+      "deskripsi": "terpasang dengan baik"
+    },
+    {
+      "bagian": "lampu depan",
+      "status": "normal",
+      "deskripsi": "berfungsi normal"
+    },
+    {
+      "bagian": "ban depan",
+      "status": "normal",
+      "deskripsi": "tekanan angin 30 psi"
+    },
+    {
+      "bagian": "ban belakang",
+      "status": "normal",
+      "deskripsi": "tekanan angin 28 psi"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "6a313268dd0d1256d6d32704"
+  },
+  "id_penyewaan": 2,
+  "id_kendaraan": 2,
+  "tipe": "check-in",
+  "tanggal_mulai": "2026-06-10",
+  "tanggal_selesai": "2026-06-12",
+  "kondisi": [
+    {
+      "bagian": "body depan",
+      "status": "normal",
+      "deskripsi": "tidak ada kerusakan"
+    }
+  ]
+}]
