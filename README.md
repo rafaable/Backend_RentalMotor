@@ -432,14 +432,12 @@ Bagian ini menjelaskan aturan validasi, penanganan error, dan logika bisnis yang
 - Berdasrkan `id_karyawan` - jika tidak ditemuka, ppesan "ID Karyawan tidak ditemuka" 
 - Berdasarkan `nama_karyawan` - jika tidak ditemukan, pesan "Nama Karyawa tidak ditemuka" 
 - Berdasarkan `id_cabang` - jika tidak ditemukan atau cabang tersebut belum miliki karyawan, pesan "Cabang tidak ditemukan atau tidak memiliki karyawan"
-- Berdasarkan `jabata` enum - jika tidak ditemukan karyawan dengan jabatan tersebut, pesan "Jabaran karyawan tidak ditemukan"
 - Error handling jika `nama_karyawan` hanya diisi oleh karakter spasi (" "), pesan "Nama tidak boleh kosong" 
 
 **POST**
 - Input data karyawan jika sukses, pesan "Data karyawab berhasil ditambahkan" 
 - Eror jika `nama_karyawan   hanya diisi oleh karakter spasi (" "), pesan "Nama tidak boleh kosong!"
 - Validasi `id_cabang` jika ID cabang tidaka terdaftar didatabase, pesan "Cabang tidak ditemukan!" 
-- Validasi `jabatan` jika pilihan jabatan ditak sesuai dengan enum, otomatis mengembalikan pesan error sistem
 - Seluruh (id_cabang, nama_karyawan, jabatan) wajin diisi, jika ada yang kosong atau salah, otomatis error sistem 
 
 **PATCH** 
@@ -447,7 +445,6 @@ Bagian ini menjelaskan aturan validasi, penanganan error, dan logika bisnis yang
 - Bisa update satu field, beberapa field, atau seluruh field sekaligus, sesuai dengan kebutuhan, tidak harus mengisi semuanya misal (satu, beberapa, atau seluruh kolom)
 - jika `nama_karyawan` diubah tapi hanya diisi oleh karakte spasi (" "), pesan "Nama tidak boleh kosong!" 
 - validasi `id_cabang`, jika id_cabang baru tidak terdaftar didatabase, pesan "Cabang tidakditemukan" 
-- validasi `jabatan` jika pilihan tidak sesuai enum, maka akan error 
 - Jika menekan Execute tanpa mengubah data apa pun (body kosong {}), pesan "Tidak ada data yang diubah"
 - Jika update berhasil, pesan "DataKaryawan berhasil diperbarui" 
 
