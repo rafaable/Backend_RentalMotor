@@ -133,135 +133,6 @@ Folder ini berisi definisi struktur data (model) menggunakan Pydantic, yang berf
 
 Folder ini berisi logika dan model untuk berinteraksi dengan koleksi-koleksi pada MongoDB. File `activity_log.py` menangani data log aktivitas, `vehicle_condition.py` menangani data laporan kondisi kendaraan, dan `maintenance.py` menangani data pemeliharaan kendaraan.
 
-
-## Deskripsi Proyek
-
-Proyek ini merupakan pengembangan backend untuk sistem **Rental Motor**, yang dibangun menggunakan **FastAPI** sebagai framework utama dan **Swagger UI** sebagai antarmuka dokumentasi serta pengujian API. Backend ini dirancang untuk terhubung dengan dua jenis basis data sekaligus, yaitu **MySQL** untuk data relasional dan **MongoDB** untuk data non-relasional (data koleksi).
-
-## Struktur Basis Data
-
-### Tabel Relasional (MySQL)
-
-Basis data relasional digunakan untuk menyimpan data inti operasional rental motor, dengan tabel dan relasi sebagai berikut:
-
-**cabang** — tabel induk yang menyimpan data cabang rental motor, tidak memiliki *foreign key*.
-
-**karyawan** — memiliki *foreign key* `id_cabang`.
-```
-cabang  1 ----- N  karyawan
-```
-
-**pengguna** — tabel independen yang menyimpan data pelanggan/pengguna layanan rental, tidak memiliki *foreign key*.
-
-**kendaraan** — memiliki *foreign key* `id_cabang`.
-```
-cabang  1 ----- N  kendaraan
-```
-
-**penyewaan** — memiliki *foreign key* `id_pengguna`, `id_kendaraan`, dan `id_karyawan`.
-```
-pengguna   1 ----- N  penyewaan
-kendaraan  1 ----- N  penyewaan
-karyawan   1 ----- N  penyewaan
-```
-
-**pengembalian** — memiliki *foreign key* `id_penyewaan` dan `id_karyawan`.
-```
-penyewaan  1 ----- N  pengembalian
-karyawan   1 ----- N  pengembalian
-```
-
-**pembayaran** — memiliki *foreign key* `id_penyewaan`.
-```
-penyewaan  1 ----- N  pembayaran
-```
-
-**denda** — memiliki *foreign key* `id_pengembalian` dan `id_karyawan`.
-```
-pengembalian  1 ----- N  denda
-karyawan      1 ----- N  denda
-```
-
-### Data Koleksi (MongoDB)
-
-Basis data non-relasional digunakan untuk menyimpan data yang bersifat lebih dinamis dan tidak terstruktur secara kaku, meliputi:
-
-- **laporan_kondisi** — menyimpan laporan kondisi kendaraan.
-- **log_aktivitas** — menyimpan jejak aktivitas pengguna maupun sistem.
-- **maintenance** — menyimpan data pemeliharaan/perawatan kendaraan.
-
-## Struktur Folder Proyek
-
-```
-Backend_RentalMotor/
-│
-├── app/
-│   ├── main.py
-│   │
-│   ├── core/
-│   │   ├── config.py
-│   │   ├── sql_connection.py
-│   │   └── mongo_connection.py
-│   │
-│   ├── routes/
-│   │   ├── cabang.py
-│   │   ├── pengguna.py
-│   │   ├── karyawan.py
-│   │   ├── kendaraan.py
-│   │   ├── penyewaan.py
-│   │   ├── pengembalian.py
-│   │   ├── pembayaran.py
-│   │   └── denda.py
-│   │
-│   ├── schemas/
-│   │   ├── cabang_schema.py
-│   │   ├── pengguna_schema.py
-│   │   ├── karyawan_schema.py
-│   │   ├── kendaraan_schema.py
-│   │   ├── penyewaan_schema.py
-│   │   ├── pengembalian_schema.py
-│   │   ├── pembayaran_schema.py
-│   │   └── denda_schema.py
-│   │
-│   └── mongo/
-│       ├── activity_log.py
-│       ├── vehicle_condition.py
-│       └── maintenance.py
-│
-├── .env
-├── requirements.txt
-├── DB
-│   ├── sql.txt
-│   └── mongodb.json
-└── report.md
-```
-
-## Penjelasan Fungsi Tiap Folder
-
-### Folder `app`
-
-Folder ini merupakan inti dari aplikasi backend. File `main.py` di dalamnya berfungsi sebagai *entry point* yang menjalankan aplikasi FastAPI, termasuk inisialisasi server, pendaftaran seluruh *router*, dan konfigurasi awal lainnya.
-
-### Folder `core`
-
-Folder ini berisi komponen-komponen dasar yang mendukung jalannya aplikasi secara keseluruhan:
-
-- `config.py` mengatur konfigurasi umum aplikasi, seperti variabel lingkungan dan parameter global.
-- `sql_connection.py` menangani koneksi ke basis data MySQL.
-- `mongo_connection.py` menangani koneksi ke basis data MongoDB.
-
-### Folder `routes`
-
-Folder ini berisi definisi *endpoint* API untuk setiap entitas dalam sistem. Setiap file merepresentasikan satu modul fitur, seperti `cabang.py` untuk endpoint terkait data cabang, `pengguna.py` untuk data pengguna, dan seterusnya untuk `karyawan`, `kendaraan`, `penyewaan`, `pengembalian`, `pembayaran`, dan `denda`. Setiap *route* menangani permintaan HTTP (GET, POST, PUT, DELETE) yang berkaitan dengan entitas masing-masing.
-
-### Folder `schemas`
-
-Folder ini berisi definisi struktur data (model) menggunakan Pydantic, yang berfungsi untuk validasi data masuk maupun keluar pada setiap endpoint. Setiap file skema berpasangan dengan modul route yang sesuai, misalnya `cabang_schema.py` mendefinisikan struktur data untuk entitas cabang, dan seterusnya untuk seluruh entitas relasional lainnya.
-
-### Folder `mongo`
-
-Folder ini berisi logika dan model untuk berinteraksi dengan koleksi-koleksi pada MongoDB. File `activity_log.py` menangani data log aktivitas, `vehicle_condition.py` menangani data laporan kondisi kendaraan, dan `maintenance.py` menangani data pemeliharaan kendaraan.
-
 ## Spesifikasi Business Logic per Endpoint
 
 Bagian ini menjelaskan aturan validasi, penanganan error, dan logika bisnis yang diterapkan pada setiap operasi CRUD (GET, POST, PATCH, DELETE) untuk masing-masing tabel:
@@ -467,6 +338,125 @@ Bagian ini menjelaskan aturan validasi, penanganan error, dan logika bisnis yang
 - Berdasarkan id_pembayaran — jika tidak ada di database, pesan "ID pembayaran tidak ditemukan"
 - Menghapus data pembayaran secara permanen dari database.
 - Jika berhasil, pesan "Data pembayaran berhasil dihapus!"
+
+---
+
+## Tabel Denda
+
+**GET**
+- Hanya mengizinkan satu parameter pencarian pada satu waktu — jika lebih dari satu filter dikirimkan, pesan "Gunakan satu filter pencarian saja"
+- GET all — jika data kosong, pesan "Data denda kosong"
+- Berdasarkan id_denda — jika tidak ada, pesan "ID tidak ditemukan"
+- Berdasarkan id_pengembalian — sistem memvalidasi ketersediaan ID di tabel pengembalian; jika tidak ada, pesan "ID pengembalian tidak ditemukan". Jika ID ada namun belum memiliki denda, pesan "Data denda tidak ditemukan"
+- Berdasarkan alasan_denda (dropdown enum: kerusakan_kendaraan, pelanggaran_lalu_lintas, keterlambatan_pengembalian) — jika tidak ada, pesan "Data tidak ditemukan"
+- Berdasarkan keterangan (pencarian kata/LIKE) — jika kata tidak ditemukan, pesan "Keterangan tidak ditemukan"
+
+**POST**
+- Seluruh elemen wajib diisi kecuali keterangan (id_pengembalian, id_karyawan, alasan_denda, nominal_denda); jika ada yang kurang, pesan "Masukkan informasi secara lengkap!"
+- Pilihan alasan_denda dibatasi untuk input manual (enum: kerusakan_kendaraan, pelanggaran_lalu_lintas).
+- nominal_denda harus lebih besar dari 0 — jika kurang atau sama dengan 0, pesan "Nominal denda harus lebih dari 0!"
+- Menghindari spasi kosong: Jika keterangan diisi, tidak boleh hanya berisi karakter spasi/kosong — jika melanggar, pesan "Keterangan tidak valid!"
+- Mengecek ketersediaan id_pengembalian di tabel pengembalian — jika tidak terdaftar, pesan "ID pengembalian tidak ditemukan!"
+- Mengecek ketersediaan id_karyawan di tabel karyawan — jika tidak terdaftar, pesan "ID karyawan tidak ditemukan!"
+- Mencegah duplikasi data: Sistem memastikan satu transaksi pengembalian tidak boleh memiliki alasan denda yang sama lebih dari satu kali — jika duplikat, pesan "Alasan denda sudah terdaftar untuk pengembalian ini!"
+- Jika data berhasil ditambahkan, dikembalikan pesan "Data denda berhasil ditambahkan" beserta id_denda yang baru dibuat.
+
+**PATCH**
+- Berdasarkan id_denda — jika tidak ada di database, pesan "ID not found"
+- Field id_denda dan id_pengembalian dikunci dan tidak diizinkan untuk di-update.
+- Field yang diizinkan untuk di-update hanya id_karyawan, alasan_denda, nominal_denda, dan keterangan — jika ada field selain itu, pesan "field tidak valid"
+- Jika id_karyawan diubah, divalidasi ke tabel karyawan — jika tidak ada, pesan "ID karyawan tidak ditemukan!"
+- Jika nominal_denda diubah, nilainya harus lebih dari 0 — jika melanggar, pesan "Nominal denda harus lebih dari 0!"
+- Jika keterangan diubah, nilainya tidak boleh hanya berisi spasi kosong — jika melanggar, pesan "Keterangan tidak valid!"
+- Jika alasan_denda diubah (hanya menerima kerusakan_kendaraan atau pelanggaran_lalu_lintas), sistem kembali mengecek duplikasi pada ID pengembalian tersebut — jika duplikat, pesan "Alasan denda sudah terdaftar untuk pengembalian ini!"
+- Jika berhasil diperbarui, pesan "Data denda berhasil diperbarui!"
+
+**DELETE**
+- Berdasarkan id_denda — jika tidak ada di database, pesan "ID not found"
+- Menghapus data denda secara permanen dari tabel database.
+- Jika berhasil, pesan "Data denda berhasil dihapus!"
+
+---
+
+## Tabel Kendaraan 
+
+**GET**
+- GET all- jika data kosong, pesan "Data kendaraan kosong"
+- Berdasarkan id_kendaraan - jika tidak ditemukan, pesan "ID tidak ditemukan" 
+- Berdasarkan id_cabang - jika tidak ditemukan, pesan "Cabang tidak ditemukan"
+- Berdasarkan merek - jika tidak ditemukan, pesan "Merek tidak ditemukan"
+- Berdasarkan model - jika tidak ditemukan, pesan "Model tidak ditemukan"
+- Berdasarkan nomor_polisi - jika tidak ditemukan, pesan "Nomor polisi tidak ditemuka"
+- Berdasarkan tahun - jika tidak ditemukan, pesan "Tidak ada kendaraan untuk tahun tersebut"
+- Berdasarkan renatang tahun_awal dan tahun_akhir, jika `tahun_awal` > `tahun_akhir`, pesan "Rentang tahun tidak valid!", jika tidak ditemukan, pesan "Tidak ada kendaraan pada rentang tahun tersebut"
+- Berdasarkan rentang tarif tarif_min dan tarif_max, jika `tarif_min` > `tarif_max`, pesan "Rentang tarif tidak valid!", jika tidak ditemukan, pesan "Tidak ada kendaraan pada rentang tarif tersebut"
+- Berdasarkan status_kendaran terdapat enum (`tersedia`, `disewa`, `dalam_perbaikan`), jika tidak ditemukan, pesan "Tidak ada kendaraan dengan status tersebut" 
+
+**POST**
+- Seluruh elemen wajib diisi (not null), jika ada yang kurang, pesan "Masukkan informasi secara lengkap!"
+-  Berdasarkan merek tidak boleh kosong / hanya spasi, jika tidak pesan "Merek tidak boleh kosong!"
+- Berdasarkan model tidak boleh kosong / hanya spasi, jika tidak pesan "Model tidak boleh kosong!"
+- Berdasarkan nomor_polisi tidak boleh kosong / hanya spasi, jika tidak pesan "Nomor polisi tidak boleh kosong!"
+- Berdasarkan tahun harus berada di antara 1990 hingga tahun berjalan saat ini, jika tidak pesan "Tahun tidak valid!"
+- Berdasarkan tarif_per_hari harus berupa angka positif (lebih dari 0), jika tidak pesan "Tarif harus berupa angka positif!"
+- Berdasarkan id_cabang harus terdaftar di tabel cabang, jika tidak pesan "Cabang tidak ditemukan!"
+- Berdasarkan nomor_polisi harus unik; jika sudah terdaftar, pesan "Nomor polisi sudah terdaftar!"
+- Berdasarkan status_kendaraan harus sesuai enum (`tersedia`, `disewa`, `dalam_perbaikan`)
+- Jika berhasil ditambahkan, pesan "Data kendaraan berhasil ditambahkan!"
+
+**PATCH**
+- Pencarian berdasarkan id_kendaraan saja - jika tidak ada, pesan "ID tidak ditemukan"
+- Bisa update satu field, beberapa field, atau seluruh field sekaligus, sesuai dengan kebutuhan, tidak harus mengisi semuanya misal (satu, beberapa, atau seluruh kolom)
+- Berdasarkan merek tidak boleh kosong / hanya spasi, jika tidak pesan "Merek tidak boleh kosong!"
+- Berdasarkan model tidak boleh kosong / hanya spasi, jika tidak pesan "Model tidak boleh kosong!"
+- Berdasarkan nomor_polisi tidak boleh kosong / hanya spasi, jika tidak pesan "Nomor polisi tidak boleh kosong!"
+- Berdasarkan nomor_polisi harus unik (kecuali milik sendiri); jika sudah dipakai kendaraan lain, pesan "Nomor polisi sudah terdaftar!"
+- Berdasarkan tahun harus berada di antara 1990 hingga tahun berjalan saat ini, jika tidak pesan "Tahun tidak valid!"
+- Berdasarkan tarif_per_hari harus berupa angka positif (lebih dari 0), jika tidak pesan "Tarif harus berupa angka positif!"
+- Berdasarkan status_kendaraan harus sesuai enum (`tersedia`, `disewa`, `dalam_perbaikan`), jika tidak pesan "Status kendaraan tidak valid!"
+- Berdasarkan id_cabang harus terdaftar di tabel cabang, jika tidak pesan "Cabang tidak ditemukan!"
+- Jika update berhasil, pesan "Data kendaraan berhasil diperbarui!"
+
+**DELETE**
+- Tidak boleh delete tanpa filter karena seluruh data akan terhapus 
+- Delete berdasarkan id_kendaraan - jika tidak ada, pesan "ID tidak ditemukan" 
+- Cek Foreign Key di tabel penyewaan — jika id_kendaraan masih digunakan di data penyewaan, pesan "Tidak bisa hapus kendaraan, masih ada data penyewaan terkait!"
+- Jika hapus kendaraan berhasil, pesan "Data Kendaraan berhasil dihapus!"
+
+---
+
+## Tabel Karyawan 
+
+**GET**
+- Get all - jika data di database kosong, pesan "Data Karyawan kosong" 
+- Berdasrkan `id_karyawan` - jika tidak ditemuka, ppesan "ID Karyawan tidak ditemuka" 
+- Berdasarkan `nama_karyawan` - jika tidak ditemukan, pesan "Nama Karyawa tidak ditemuka" 
+- Berdasarkan `id_cabang` - jika tidak ditemukan atau cabang tersebut belum miliki karyawan, pesan "Cabang tidak ditemukan atau tidak memiliki karyawan"
+- Berdasarkan `jabata` enum - jika tidak ditemukan karyawan dengan jabatan tersebut, pesan "Jabaran karyawan tidak ditemukan"
+- Error handling jika `nama_karyawan` hanya diisi oleh karakter spasi (" "), pesan "Nama tidak boleh kosong" 
+
+**POST**
+- Input data karyawan jika sukses, pesan "Data karyawab berhasil ditambahkan" 
+- Eror jika `nama_karyawan   hanya diisi oleh karakter spasi (" "), pesan "Nama tidak boleh kosong!"
+- Validasi `id_cabang` jika ID cabang tidaka terdaftar didatabase, pesan "Cabang tidak ditemukan!" 
+- Validasi `jabatan` jika pilihan jabatan ditak sesuai dengan enum, otomatis mengembalikan pesan error sistem
+- Seluruh (id_cabang, nama_karyawan, jabatan) wajin diisi, jika ada yang kosong atau salah, otomatis error sistem 
+
+**PATCH** 
+- pencarian berdarkan `id_karyawan` jika tidak ditemukan, pesan "ID karyawan tidak ditemukan"
+- Bisa update satu field, beberapa field, atau seluruh field sekaligus, sesuai dengan kebutuhan, tidak harus mengisi semuanya misal (satu, beberapa, atau seluruh kolom)
+- jika `nama_karyawan` diubah tapi hanya diisi oleh karakte spasi (" "), pesan "Nama tidak boleh kosong!" 
+- validasi `id_cabang`, jika id_cabang baru tidak terdaftar didatabase, pesan "Cabang tidakditemukan" 
+- validasi `jabatan` jika pilihan tidak sesuai enum, maka akan error 
+- Jika menekan Execute tanpa mengubah data apa pun (body kosong {}), pesan "Tidak ada data yang diubah"
+- Jika update berhasil, pesan "DataKaryawan berhasil diperbarui" 
+
+**DELETE**
+- Penghapusan berdasakan `id_karyawan`  jika tidak ditemukan, pesan  "ID karyawan tidak ditemukan"
+- jika proses hapus berhasil, pesan "Data Karyawan berhasil dihapus" 
+
+---
+
 
 # Dokumentasi MongoDB - Sistem Rental Motor
 
